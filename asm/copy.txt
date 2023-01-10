@@ -1,0 +1,145 @@
+
+in 
+pop ax
+in
+pop bx
+in
+pop cx
+
+push ax
+push 0
+
+jne : 10
+
+push 0
+push bx
+jne : 5
+
+push 0
+push cx
+
+jne : 3
+
+
+push 777 # Infinite Roots
+print
+
+jmp : 100
+
+: 3
+
+push 0 # NO ROOTS
+print
+
+jmp : 100
+
+: 5
+
+push bx
+push cx
+push -1
+mul
+div
+print
+
+jmp : 100
+
+: 10 # If ax != 0
+
+
+push 4
+push ax
+push cx
+mul
+mul
+
+push bx
+push bx
+mul
+
+sub
+
+sqrt
+pop dx
+
+push dx
+push 0
+
+je : 20
+
+
+push dx
+push 0
+jb : 25
+
+push 0 # No Roots
+jmp : 100
+
+: 25
+
+push 2   # first Root
+push ax
+mul
+pop fx
+
+push bx
+push -1
+mul
+
+push dx
+sqrt
+
+sum
+
+
+div
+print
+
+push fx     # second Root
+
+push dx
+sqrt
+
+push bx
+push -1
+mul
+
+sub
+
+div
+print
+
+jmp : 100
+
+: 20
+
+push 2
+push ax
+mul
+
+push -1
+push bx
+mul
+div
+
+print
+jmp : 100
+
+: 100
+
+hlt
+
+
+////////
+//     replacement = fopen("test.bin", "rb");
+//     ASSERT(replacement != nullptr, return ERROR_IN_OPEN_FILE);
+
+//     double arr[1000];
+//     size_t check_fwrite1 = fread(arr, sizeof(Data), test_bin_number, replacement);
+//     ASSERT(check_fwrite1 == test_bin_number, return ERROR_IN_FWRITE);
+//     for (int i = 0; i < test_bin_number; i++) {
+//         printf("[%d] = %lg\n", i, arr[i]);
+//     }
+//     printf("\n");
+//     char check_file_close1 = fclose(replacement);
+//     ASSERT(check_file_close1 == 0, return ERROR_IN_CLOSE_FILE);
