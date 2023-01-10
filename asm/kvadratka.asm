@@ -1,3 +1,44 @@
+# the name of the programm
+
+text_begin
+
+push 10
+push 58
+push 99
+push 32
+push 98
+push 32
+push 97
+push 32
+push 114
+push 101
+push 116
+push 110
+push 69
+push 10
+push 110
+push 111
+push 105
+push 116
+push 97
+push 117
+push 113
+push 101
+push 32
+push 99
+push 105
+push 116
+push 97
+push 114
+push 100
+push 97
+push 117
+push 81
+push 10
+
+text_end
+
+# enter a b c
 
 in 
 pop ax
