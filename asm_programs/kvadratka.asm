@@ -1,3 +1,4 @@
+
 # the name of the programm
 
 text_begin
@@ -82,7 +83,7 @@ push 73
 
 text_end 
 
-jmp : 100
+hlt
 
 : 3
 
@@ -101,8 +102,9 @@ push 78
 
 text_end 
 
-jmp : 100
+hlt
 
+# if bx != 0
 : 5
 
 push bx
@@ -112,7 +114,7 @@ mul
 div
 print
 
-jmp : 100
+hlt
 
 : 10
 
@@ -143,22 +145,10 @@ push dx
 push 0
 jb : 25
 
-# No Roots
+# if dx < , end programm and print 'No roots'
 
-text_begin 
-
-push 83
-push 84
-push 79
-push 79
-push 82
-push 32
-push 79
-push 78
-
-text_end 
-
-jmp : 100
+call 3    
+hlt
 
 : 25
 
@@ -196,7 +186,7 @@ sub
 div
 print
 
-jmp : 100
+hlt
 
 : 20
 
@@ -210,11 +200,11 @@ mul
 div
 
 print
-jmp : 100
 
-: 100
+meow
 
 hlt
+
 
 
 
