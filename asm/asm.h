@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <stdarg.h>
 
-
 #include "my_assert.h"
 #include "registers.h"
 
@@ -45,6 +44,12 @@ struct token {
     int value;
     int cmd;
 } ;
+
+typedef struct {
+
+    const char* label_name;
+    int lable_number;
+} Label;
 
 enum Labels {
 
@@ -84,6 +89,7 @@ enum Commands{
 #undef CMD
 
 } ;
+
 
 size_t getFileSize (const char *file);
 

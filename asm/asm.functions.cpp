@@ -118,7 +118,6 @@ void CheckingForCorrectData (buffer* asm_commands, int* count_errors) {
 
 }
 
-
 void ValidationOfInputData(char* string, int line, int* count_errors) {
     ASSERT(string != nullptr);
     if (string == nullptr) {
@@ -261,8 +260,7 @@ int GiveRegistor(char* command) {
     char arr[] = "push pop";
     int labels_value   = 0;
     for (size_t number = 0; number < asm_commands->numbers_of_strings; number++, labels_value++) {
-        if (number >= 3 && strstr(arr, tokens[number - 3].string)) {
-                
+        if (number >= 2 && strstr(arr, tokens[number - 2].string)) {
                 labels_value++;
         }
         if (!strcmp("L", tokens[number].string)) {

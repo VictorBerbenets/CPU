@@ -16,9 +16,7 @@ int main() {
     token* tokens = FillStruct (&asm_commands); // tokens
 
     ReplacingArgumentsInJmp(tokens, &asm_commands, Labels);
-    for (size_t i = 0; i < asm_commands.numbers_of_strings; i++) {
-        fprintf(stderr, "token[%zd] = <%s>\n",i,  tokens[i].string);
-    }
+
     if (count_errors) {
         return ERROR_IN_FILE;
     }
@@ -61,19 +59,6 @@ int main() {
 
     char check_file_close = fclose(replacement);
     ASSERT(check_file_close == 0, return ERROR_IN_CLOSE_FILE);
-
-        replacement = fopen("test.bin", "rb");
-    ASSERT(replacement != nullptr, return ERROR_IN_OPEN_FILE);
-
-    double arr[1000];
-    size_t check_fwrite1 = fread(arr, sizeof(Data), test_bin_number, replacement);
-    ASSERT(check_fwrite1 == test_bin_number, return ERROR_IN_FWRITE);
-    for (int i = 0; i < test_bin_number; i++) {
-        printf("[%d] = %lg\n", i, arr[i]);
-    }
-    printf("\n");
-    char check_file_close1 = fclose(replacement);
-    ASSERT(check_file_close1 == 0, return ERROR_IN_CLOSE_FILE);
 
     Destructor(&asm_commands, &tokens, &test_bin_commands);
 
