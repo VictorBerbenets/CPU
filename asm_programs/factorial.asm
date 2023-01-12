@@ -1,8 +1,14 @@
 
 text_begin
 
-push 10
+push 32
 push 58
+push 114
+push 101
+push 116
+push 110
+push 69
+push 10
 push 108
 push 97
 push 105
@@ -18,6 +24,12 @@ text_end
 
 in
 pop ax
+
+text_begin
+
+push 10
+
+text_end
 
 push 1
 pop bx
