@@ -45,7 +45,7 @@ void push(CPU* my_cpu, int* number) {
 
     (*number)++;
     if (my_cpu->data[*number] == Push_reg) {
-
+        
         (*number)++;
         StackPush(&my_cpu->stack_cpu, my_cpu->cpu_registers[(int) my_cpu->data[*number]]);
     }
@@ -58,7 +58,6 @@ void push(CPU* my_cpu, int* number) {
 void pop(CPU* my_cpu, int* number) {
 
     (*number)++;
-    _StackDump(&my_cpu->stack_cpu);
     if (my_cpu->data[*number] == Pop_reg) { 
         (*number)++;
         my_cpu->cpu_registers[(int) my_cpu->data[*number]] = StackPop(&my_cpu->stack_cpu);
@@ -257,7 +256,7 @@ void hlt(int* number) {
 void print(CPU* my_cpu) {
     
     Data last_number_in_stack = StackPop(&my_cpu->stack_cpu);
-    printf("%lg\n", last_number_in_stack);
+    printf("%lg", last_number_in_stack);
     StackPush(&my_cpu->stack_cpu, last_number_in_stack);
 }
 
@@ -290,5 +289,10 @@ void text(CPU* my_cpu, int* number) {
     for (int current_symbol = 0; current_symbol < number_of_symbols; current_symbol++) {
         printf("%c", (int)StackPop(&my_cpu->stack_cpu));
     }
-    printf("\n");
+
+}
+
+void meow() {
+
+    printf("\nmeeeow\n\n");
 }

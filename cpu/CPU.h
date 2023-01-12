@@ -90,6 +90,8 @@ void out(stack* st);
 
 void div(stack* st);
 
+void meow();
+
 void print(CPU* my_cpu);
 
 void sqrt(stack* stack_cpu);

@@ -28,11 +28,7 @@ int main(){
 
     char is_file_closed = fclose(TEST_BIN);
     ASSERT(!is_file_closed, return ERROR_IN_CLOSSING_FILE);
-
-    for (size_t i = 0; i < my_cpu.data_size; i++) {
-        printf("[%zd] = %lg\n", i, my_cpu.data[i]);
-    }
-    printf("\n");
+    
     
     for (int number = 0 ; number < (int)my_cpu.data_size && number != Stop_programm; number++){ // while 
         _StackCheck(&my_cpu.stack_cpu);
@@ -59,7 +55,8 @@ int main(){
             case cpu_ret:        ret  (&addresses_for_call, &number);                               break;
             case cpu_print:      print(&my_cpu);                                                    break;
             case cpu_hlt:        hlt  (&number);                                                    break;                
-            case cpu_text_begin: text (&my_cpu, &number);                                           break;                           
+            case cpu_text_begin: text (&my_cpu, &number);                                           break; 
+            case cpu_meow:       meow ();                                                           break;                          
             default:             error(&my_cpu, number);                                            break;
         }
     }
