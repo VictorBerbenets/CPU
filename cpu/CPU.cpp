@@ -1,11 +1,5 @@
 #include "CPU.h"
 
-// const int Registers_size = 6;
-// int cpu_registers[Registers_size] = {};
-//#include "asm.h"
-    //1) Сделать массив меток размером 512(например) забитый -1 (обозначение неправильной метки)
-    //2) Компиляция в два прохода ОДИНАКОВЫХ
-    //3) в проце сделать push_reg - взять значение из стека и положить в переданный в аргументе регистр, pop_reg - взять значение из стека и положить в регистр
 
 int main(){
 
@@ -28,7 +22,7 @@ int main(){
 
     char is_file_closed = fclose(TEST_BIN);
     ASSERT(!is_file_closed, return ERROR_IN_CLOSSING_FILE);
-    
+
     
     for (int number = 0 ; number < (int)my_cpu.data_size && number != Stop_programm; number++){ // while 
         _StackCheck(&my_cpu.stack_cpu);
