@@ -1,12 +1,17 @@
 #include "asm.h"
 #include "labels.h"
 
+
+#define Grey "\033[0m"
+#define Red  "\033[0;31m"
+
 void Check_Push(char** pt, int line, char* string, int* count_errors ) {
 
     Data argument  = 0;
     int value     = 0;
     int symb      = 0;
-    char push_reg[len_registr + 1];
+
+    char* push_reg = (char*) calloc(len_registr + 1, sizeof(char));
 
     if ((value = sscanf(*pt, "%lg%n", &argument, &symb))) {
 
@@ -26,6 +31,7 @@ void Check_Push(char** pt, int line, char* string, int* count_errors ) {
             }
         (*pt)++;
         }
+        free(push_reg);
     }
 
     else if ((Strlen(*pt) == len_registr)) {
@@ -39,46 +45,50 @@ void Check_Push(char** pt, int line, char* string, int* count_errors ) {
         (*pt)++;
         }
 
-        if (strstr(register_arguments, push_reg) == nullptr) {         // функции с переменным числом параметром Керниган, va_list, va_start,  va_end                        vfprintf
+        if (strstr(register_arguments, push_reg) == nullptr) {      
 
             fprintf(stderr, "\n\033[0;31merror\033[0m in line '%d':\"%s\" -Invalid input\n"
             "\"%s\" is invalid symbols\n\n", line, string, *pt);
             *count_errors += INVALID_SYMBOLS;
         }
+
+        free(push_reg);
     }
     
     else {
-
+        
         fprintf(stderr, "\n\033[0;31merror\033[0m in line '%d':\"%s\" -Invalid input\n"
         "\"%s\" is invalid data - argument \"push\" must be a number.\n\n", line, string, *pt);
         *count_errors += INVALID_ARGUMENT;
+        free(push_reg);
     }
 
 }
 
 void Check_Pop_Reg(char** pt, int line, char* string, int* count_errors ) {
 
-    char push_reg[len_registr + 1];
+    char* pop_reg = (char*) calloc(len_registr + 1, sizeof(char));
 
     if ((Strlen(*pt) == len_registr)) {
         int number = 0;
-        
         while (**pt != '\0') {
             if (**pt != ' ') {
-                push_reg[number] = **pt;
+                pop_reg[number] = **pt;
                 number++;
             }
         (*pt)++;
         }
 
-        if (strstr(register_arguments, push_reg) == nullptr) {
-
+        if (strstr(register_arguments, pop_reg) == nullptr) {
             fprintf(stderr, "\n\033[0;31merror\033[0m in line '%d':\"%s\" -Invalid input\n"
             "\"%s\" is invalid symbols\n\n", line, string, *pt);
             *count_errors += INVALID_SYMBOLS;
         }
+        free(pop_reg);
     }
     else if (!Strlen(*pt)) {
+        
+        free(pop_reg);
         return ;
     }
     else {
@@ -86,10 +96,12 @@ void Check_Pop_Reg(char** pt, int line, char* string, int* count_errors ) {
         fprintf(stderr, "\n\033[0;31merror\033[0m in line '%d':\"%s\" -Invalid input\n"
         "\"%s\" is invalid data - argument \"pop\" must be register(ax, bx, cx, dx)\n\n", line, string, *pt);
         *count_errors += INVALID_ARGUMENT;
+        free(pop_reg);
     }
 }
 
-void Check_Jmp(char** pt, int line, char* string, int* count_errors ) {
+    
+void Check_Jmp(char** pt, int line, char* string, int* count_errors) {
 
     int value    = 0;
     int argument = 0;
@@ -106,6 +118,7 @@ void Check_Jmp(char** pt, int line, char* string, int* count_errors ) {
         return ;
     }
     (*pt)++;
+
     if ((value = sscanf(*pt, "%d%n", &argument, &symb))) {
         
         *pt += symb;
@@ -150,8 +163,6 @@ void Check_Command_Without_Argument(char** pt, int line, char* string, int* coun
 int Check_First_Command(char** pt, char* data, int line, char* string, int* count_errors) {
 
     int symb      = 0;
-    int argument  = 0;
-    int value     = 0;
 
     if (!sscanf(*pt, "%s%n", data, &symb) && symb != 0) {
         fprintf(stderr, "\n\033[0;31merror\033[0m in line '%d':\"%s\" -Invalid input\n"
@@ -165,7 +176,6 @@ int Check_First_Command(char** pt, char* data, int line, char* string, int* coun
 
     if (Is_Label(string)) {
         return IsCorrectData((char*) "label");
-        //return LABEL;
     }
 
     *pt += symb;
@@ -252,7 +262,37 @@ void Check_label(char** pt, int line, char* string, int* count_errors ) {
         }
     }
     else  PrintErrorForCommand(line, string, pt, count_errors, 0, 1, INVALID_ARGUMENT_OF_LABEL3); 
+}
 
+
+void Check_db (char** pt, int line, char* string, int* count_errors) {
+    while (**pt == ' ') {
+        (*pt)++;
+    }
+
+    if (**pt != '\"') {
+        fprintf(stderr, ""Red"err1 "Grey"\n");
+        *count_errors += 1;
+        return ;
+    }
+
+    while (**pt != '^') {
+        printf("*pt = <%c>\n", **pt);
+        (*pt) ++;
+    }
+    
+    printf("STRLEN = %d\n", Strlen(*pt));
+    if (Strlen(++(*pt)) != sizeof('\"')) {
+        fprintf(stderr, ""Red"error "Grey"\n");
+        *count_errors += 1;
+
+    }
+
+    else if (**pt != '\"') {
+        fprintf(stderr, ""Red"err3 "Grey"\n");
+        *count_errors += 1;
+
+    }
 }
 
 //return number of not space's symbols
@@ -291,6 +331,7 @@ int Is_Label(char* string) {
     return 0;
 }
 
+
  void PrintErrorForCommand(int line, char* string, char** pt, int* count_errors, int argument, int numbers_of_errors, ...) {
 
     va_list ptr = {};
@@ -309,7 +350,7 @@ int Is_Label(char* string) {
                 *count_errors += INVALID_SYMBOLS;
                 break;
             case INVALID_ARGUMENT:             
-                fprintf(stderr, "\n\033[0;31merror\033[0m in line '%d':\"%s\" -Invalid input\n"
+                fprintf(stderr, "\n\033[0;31merror" Grey "in line '%d':\"%s\" -Invalid input\n"
                 "\"%s\" is invalid data - argument must be a number.\n\n", line, string, *pt);
                 *count_errors += INVALID_ARGUMENT;
                 break;
@@ -346,3 +387,4 @@ int Is_Label(char* string) {
     }
     va_end(ptr);
 }
+

@@ -25,7 +25,7 @@ void FillBuffer (buffer* asm_commands) {
     ASSERT(test_asm != nullptr);
 
     asm_commands->buf_size = getFileSize("test.asm");
-    asm_commands->buf = (char*) calloc(asm_commands->buf_size, sizeof(char));
+    asm_commands->buf = (char*) calloc(asm_commands->buf_size + 1, sizeof(char));
 
     ASSERT(asm_commands->buf != nullptr);
     
@@ -46,18 +46,31 @@ token*  FillStruct (buffer* asm_commands) {
     ASSERT(asm_commands->buf != nullptr);
 
     size_t number_of_commands = CountComands (asm_commands);
-
+    printf("numbercom = %zd\n", number_of_commands);
     token* tokens = (token*) calloc(number_of_commands, sizeof(token));
     ASSERT(tokens != nullptr);
 
+    printf("buf = <%s>\n", asm_commands->buf);
     tokens[0].string = strtok(asm_commands->buf, separates_symbols);
 
-    int tokens_number = 0;
-    while(tokens[tokens_number].string) {
-        tokens_number++;
-        tokens[tokens_number].string = strtok (NULL, separates_symbols);   
+    char* string      = nullptr;
+    size_t tokens_number = 1;
+    while(tokens_number != number_of_commands) {
+        printf("tokens[%zd].string = <%s>\n", tokens_number - 1, tokens[tokens_number - 1].string);
+
+        string = strtok (NULL, separates_symbols);
+        if (string != nullptr) {
+            tokens[tokens_number].string = string;
+            tokens_number++;
+        }
+        else {
+            break;
+        }
     }
+
+    printf("tokens_number = %zd\n", tokens_number);
     asm_commands->numbers_of_strings = tokens_number;
+
     return tokens;
 }
 
@@ -114,12 +127,14 @@ void CheckingForCorrectData (buffer* asm_commands, int* count_errors) {
     for (size_t string_number = 0; string_number < asm_commands->numbers_of_strings; string_number++) { //string_number < asm_commands->numbers_of_strings
         ValidationOfInputData(pts[string_number], string_number, count_errors);
     }
+    printf("commands = <%zd>\n", asm_commands->numbers_of_strings);
     free(pts);
-
 }
 
 void ValidationOfInputData(char* string, int line, int* count_errors) {
+
     ASSERT(string != nullptr);
+
     if (string == nullptr) {
         return ;
     }
@@ -144,7 +159,9 @@ void ValidationOfInputData(char* string, int line, int* count_errors) {
         case asm_ja:        Check_Jmp(&pt, line, string, count_errors);                                 break;
         case asm_jb:        Check_Jmp(&pt, line, string, count_errors);                                 break;
         case asm_call:      Check_call(&pt, line, string, count_errors);                                break;
+        case asm_out_text:  Check_call(&pt, line, string, count_errors);                                break;
         case asm_label:     Check_label(&pt, line, string, count_errors);                               break;
+        case asm_db:        Check_db   (&pt, line, string, count_errors);                               break;
         case UNCORRECTDATA: PrintErrorForCommand(line, string, 0, count_errors, 0, 1, INVALID_COMMAND); break;
         default:            Check_Command_Without_Argument(&pt, line, string, count_errors);            
     }
@@ -177,14 +194,23 @@ void Constructor(buffer* asm_commands, char*** pts) {
 
     char* is_eof            = asm_commands->buf;
     char* buf_pointer       = asm_commands->buf;
+    size_t buf_size         = asm_commands->buf_size;
     size_t number_of_string = 0;
     size_t symbols          = 0;
-    for (size_t symbols_in_one_string = 0; symbols <= asm_commands->buf_size && *is_eof != EOF ; is_eof++, symbols ++) { 
+
+    for (size_t symbols_in_one_string = 0; symbols < buf_size; is_eof++, symbols ++) { 
 
         if (*is_eof != '\n' && *is_eof != '\0') {
-            if (*is_eof == '#') { SkipComments(&is_eof, &symbols_in_one_string, &symbols);}
+
+            if (*is_eof == '#') { SkipComments(&is_eof, &symbols_in_one_string, &symbols, buf_size);}
             else                { symbols_in_one_string++;             continue; }
         }   
+
+        if (*is_eof != '\n' && *is_eof != '\0') {
+
+            symbols_in_one_string++; continue;
+        }   
+
         *is_eof                    = '\0';
         *(*pts + number_of_string) = buf_pointer;
         number_of_string++;
@@ -192,11 +218,15 @@ void Constructor(buffer* asm_commands, char*** pts) {
         symbols_in_one_string = 0;
      
     }
+
+    *(is_eof) = '\0';
+    asm_commands->numbers_of_strings = number_of_string;
+
 }
 
-void SkipComments(char** is_eof, size_t* symbols_in_one_string, size_t* symbols) {
+void SkipComments(char** is_eof, size_t* symbols_in_one_string, size_t* symbols, size_t buf_size) {
 
-    while (**is_eof != '\n' && **is_eof != EOF) {
+    while (**is_eof != '\n' && *symbols < buf_size) {
         **is_eof = '\0';
         (*is_eof)++;
         (*symbols_in_one_string)++;
@@ -204,7 +234,7 @@ void SkipComments(char** is_eof, size_t* symbols_in_one_string, size_t* symbols)
     }
 }
 
-void Destructor(buffer* asm_commands, token** tokens, Data** test_bin_commands) {
+void Destructor(buffer* asm_commands, token** tokens, char** test_bin_commands) {
 
     token* ptr = *tokens;
     for (size_t number = 0; number < asm_commands->numbers_of_strings; number++) {
@@ -283,27 +313,53 @@ int GiveRegistor(char* command) {
     }
  }
 
-void MarkRegisterCommand(Data** test_bin_commands, size_t* test_bin_number, size_t* number_of_elements_to_fread, char* command) {
-
+void MarkRegisterCommand( char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command) {
+    printf("TTTTTTTTTTTTTTTTTTTTest_number BBBBBBBBBBefore = <%zd>\n", *test_bin_number);
     int reg = GiveRegistor(command);
-    *((*test_bin_commands) + *test_bin_number) = Push_reg;
+    *(*test_bin_commands + *test_bin_number) = (char) Push_reg;
 
     (*test_bin_number)++;
-    (*number_of_elements_to_fread)++;
-    *test_bin_commands = (Data*) realloc(*test_bin_commands, (*number_of_elements_to_fread) * sizeof(Data));
+    printf("How memory i give = %zd\n", *size);
+    (*size) ++;
+    *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+    printf("How memory i give = %zd\n", *size);
+
+
     
-    *((*test_bin_commands) + *test_bin_number) = reg;
+    *(*test_bin_commands + *test_bin_number) = (char) reg;
+    printf("TTTTTTTTTTTTTTTTTTTTest_number AAAAAAAAAAAAAAAAafter = <%zd>\n", *test_bin_number);
 }
 
-void MarkNotRegisterCommand(Data** test_bin_commands, size_t* test_bin_number, size_t* number_of_elements_to_fread) {
+void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command) {
 
     if (*((*test_bin_commands) + *test_bin_number - 1) == asm_push || *((*test_bin_commands) + *test_bin_number - 1) == asm_pop) {
-        *((*test_bin_commands) + *test_bin_number) = 0;
-        (*test_bin_number)++;
-        (*number_of_elements_to_fread)++;
-        *test_bin_commands = (Data*) realloc(*test_bin_commands, ++(*number_of_elements_to_fread)*sizeof(Data));
+
+        *(*test_bin_commands + *test_bin_number) = 0;
+        (*test_bin_number) ++;
+
+        *size              += sizeof(Data) + 1;
+        *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+        *(Data*)(*test_bin_commands + *test_bin_number) = atof(command);
+        (*test_bin_number) += sizeof(Data) - 1;
+
+    }
+}
+
+void GetTextInArray (char ** test_bin_commands, size_t* test_bin_number, char* text_string, size_t* size) {
+
+    char* string_ptr   = text_string;
+    *size             += strlen(text_string);
+    *test_bin_commands = (char*) realloc(*test_bin_commands, (*size) * sizeof(char));
+    string_ptr ++;
+
+    while (*string_ptr != '^') {
+        *(*test_bin_commands + *test_bin_number) = *string_ptr;
+        printf("arr[%zd] = <%c>\n", *test_bin_number, *(*test_bin_commands + *test_bin_number));
+        string_ptr ++;
+        (*test_bin_number) ++;
     }
 
+    *(*test_bin_commands + *test_bin_number) = *string_ptr;
 }
 
 int IsLabelCommand(const char* command) {
