@@ -15,21 +15,21 @@
 
 const int Stop_programm = -1;
 
-const int Push_reg = 777;
-const int Pop_reg = 777;
+const int Push_reg = 69;
+const int Pop_reg  = 69;
 
 const int Ram_size       = 256;
-const int Registers_size = 6;
+const int Registers_size = 7;
 
 const Data Epsilon       = 1e-17;
 
 struct CPU { 
 
     stack stack_cpu   ;
-    Data*  data       ;    
     size_t data_size  ;
-    Data cpu_registers[Registers_size];
     Data Ram[Ram_size];
+    Data cpu_registers[Registers_size];
+    char*  data       ;    
 } ;
 
 
@@ -103,5 +103,7 @@ void error(CPU* my_cpu, int number);
 int is_equal(Data number1, Data number2); 
 
 void text(CPU* my_cpu, int* number);
+
+void Destructor(CPU* my_cpu);
 
 #endif

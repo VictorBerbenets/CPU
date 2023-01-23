@@ -44,27 +44,42 @@ void in(stack* stack_cpu, int* number) {
 void push(CPU* my_cpu, int* number) {
 
     (*number)++;
+    _StackDump(&my_cpu->stack_cpu);
+    // printf("number = %d\n", *number);
+        // printf("my_cpu->data[*number] = %d\n", my_cpu->data[*number]);
+
     if (my_cpu->data[*number] == Push_reg) {
-        
+        // printf("my_cpu->data[*number] = %d\n", my_cpu->data[*number]);
         (*number)++;
-        StackPush(&my_cpu->stack_cpu, my_cpu->cpu_registers[(int) my_cpu->data[*number]]);
+        StackPush(&my_cpu->stack_cpu, my_cpu->cpu_registers[(int)my_cpu->data[*number]]);
+        // printf("my_cpu->cpu_registers[my_cpu->data[%d]] = <%lg>\n", *number, my_cpu->cpu_registers[my_cpu->data[*number]]);
     }
     else {
         (*number)++;
-        StackPush(&my_cpu->stack_cpu, my_cpu->data[*number]);
+        StackPush(&my_cpu->stack_cpu, *(Data*)(my_cpu->data + *number));
+        // printf("*(Data*)(my_cpu->data + *number) = %lg\n", *(Data*)(my_cpu->data + *number));
+        (*number) += sizeof(Data) - 1;
     }
+    _StackDump(&my_cpu->stack_cpu);
+
 }
 
 void pop(CPU* my_cpu, int* number) {
-
+    _StackDump(&my_cpu->stack_cpu);
     (*number)++;
+    // printf("Number in pop2 = %d\n", *number);
+    // printf("my_cpu->data[%d] = %d\n", *number, my_cpu->data[*number]);
     if (my_cpu->data[*number] == Pop_reg) { 
         (*number)++;
-        my_cpu->cpu_registers[(int) my_cpu->data[*number]] = StackPop(&my_cpu->stack_cpu);
+        Data x = StackPop(&my_cpu->stack_cpu);
+        my_cpu->cpu_registers[(int) my_cpu->data[*number]] = x;
     }
     else {
+        (*number)++;
         StackPop(&my_cpu->stack_cpu);
     }
+    _StackDump(&my_cpu->stack_cpu);
+
 }
 
 void sqrt(stack* stack_cpu) {
@@ -75,7 +90,9 @@ void sqrt(stack* stack_cpu) {
 void jmp(CPU* my_cpu, int* number) {
 
     (*number)++;
-    *number = (int) my_cpu->data[*number] - 1;
+
+    // *number = my_cpu->data[*number] - 1;
+    *number = *((int*)(my_cpu->data + *number)) - 1;
 }
 
 void jae(CPU* my_cpu, int* number) {
@@ -85,7 +102,11 @@ void jae(CPU* my_cpu, int* number) {
     Data stack_value2 = StackPop(&my_cpu->stack_cpu);
 
     if (stack_value1 >= stack_value2) {
-        *number = (int) my_cpu->data[*number] - 1;
+        
+        *number = *((int*)(my_cpu->data + *number)) - 1;
+    }
+    else {
+        (*number) += sizeof(int) - 1;
     }
 }
 
@@ -96,7 +117,11 @@ void ja(CPU* my_cpu, int* number) {
     Data stack_value2 = StackPop(&my_cpu->stack_cpu);
 
     if (stack_value1 > stack_value2) {
-        *number = (int) my_cpu->data[*number] - 1;
+
+        *number = *((int*)(my_cpu->data + *number)) - 1;
+    }
+    else {
+        (*number) += sizeof(int) - 1;
     }
     
 }
@@ -108,7 +133,11 @@ void jbe(CPU* my_cpu, int* number) {
     Data stack_value2 = StackPop(&my_cpu->stack_cpu);
 
     if (stack_value1 <= stack_value2) {
-        *number = (int) my_cpu->data[*number] - 1;
+
+        *number = *((int*)(my_cpu->data + *number)) - 1;
+    }
+    else {
+        (*number) += sizeof(int) - 1;
     }
     
 }
@@ -119,7 +148,11 @@ void jb(CPU* my_cpu, int* number) {
     Data stack_value1 = StackPop(&my_cpu->stack_cpu);
     Data stack_value2 = StackPop(&my_cpu->stack_cpu);
     if (stack_value1 < stack_value2) {
-        *number = (int) my_cpu->data[*number] - 1;
+
+        *number = *((int*)(my_cpu->data + *number)) - 1;
+    }
+    else {
+        (*number) += sizeof(int) - 1;
     }
 }
 
@@ -130,7 +163,11 @@ void jne(CPU* my_cpu, int* number) {
     Data stack_value2 = StackPop(&my_cpu->stack_cpu);
 
     if (!is_equal(stack_value1, stack_value2)) {
-        *number = (int) my_cpu->data[*number] - 1;
+
+        *number = *((int*)(my_cpu->data + *number)) - 1;
+    }
+    else {
+        (*number) += sizeof(int) - 1;
     }
 }
 
@@ -141,19 +178,27 @@ void je(CPU* my_cpu, int* number) {
     Data stack_value2 = StackPop(&my_cpu->stack_cpu);
 
     if (is_equal(stack_value1, stack_value2)) {
-        *number = (int) my_cpu->data[*number] - 1;
+
+        *number = *((int*)(my_cpu->data + *number)) - 1;
+    }
+
+    else {
+        (*number) += sizeof(int) - 1;
     }
 }
 
 void call(CPU* my_cpu, int* number, stack* addresses_for_call) {
-
-    StackPush(addresses_for_call, *number + 1);
+    printf("Number call before = %d\n", *number);
+    printf("Number call after  = %d\n", *number + sizeof(int));
+    StackPush(addresses_for_call, *number + sizeof(int));
     (*number)++;
-    *number = (int) my_cpu->data[*number] - 1;
+    // *number = my_cpu->data[*number] - 1;
+    *number = *((int*)(my_cpu->data + *number)) - 1;
+
 }
 
 void ret(stack* addresses_for_call, int* number) {
-    
+
     *number = (int) StackPop(addresses_for_call);
 }
 
@@ -254,15 +299,16 @@ void hlt(int* number) {
 }
 
 void print(CPU* my_cpu) {
-    
+    printf("WHERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRAERRRRRRRRRRRRRRRRRRRRRRYOUUUUUUUUUUUUU\n");
+    _StackDump(&my_cpu->stack_cpu);
     Data last_number_in_stack = StackPop(&my_cpu->stack_cpu);
-    printf("%lg", last_number_in_stack);
+    printf("\n%.2lf\n", last_number_in_stack);
     StackPush(&my_cpu->stack_cpu, last_number_in_stack);
 }
 
 void error(CPU* my_cpu, int number) {
 
-    printf("invalid command: %lg\n", my_cpu->data[number]);
+    printf("invalid command: %d\n", my_cpu->data[number]);
 }
 
 int is_equal(Data number1, Data number2) {
@@ -291,6 +337,12 @@ void text(CPU* my_cpu, int* number) {
     }
 
 }
+
+void Destructor(CPU* my_cpu) {
+
+    free(my_cpu->data);
+}
+
 
 void meow() {
 
