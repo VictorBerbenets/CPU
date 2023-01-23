@@ -35,7 +35,7 @@ void in(stack* stack_cpu, int* number) {
         printf("\n*********************************************************************\n");
         printf("\033[0;31mERROR\033[0m!!!\n\"%s\" - invalid symbols\n", arr);
         printf("Please try again!\n");
-        printf("*********************************************************************\n");
+        printf("***********************************************************************\n");
         
         (*number) --;
     }
@@ -44,41 +44,34 @@ void in(stack* stack_cpu, int* number) {
 void push(CPU* my_cpu, int* number) {
 
     (*number)++;
-    _StackDump(&my_cpu->stack_cpu);
-    // printf("number = %d\n", *number);
-        // printf("my_cpu->data[*number] = %d\n", my_cpu->data[*number]);
 
     if (my_cpu->data[*number] == Push_reg) {
-        // printf("my_cpu->data[*number] = %d\n", my_cpu->data[*number]);
+
         (*number)++;
         StackPush(&my_cpu->stack_cpu, my_cpu->cpu_registers[(int)my_cpu->data[*number]]);
-        // printf("my_cpu->cpu_registers[my_cpu->data[%d]] = <%lg>\n", *number, my_cpu->cpu_registers[my_cpu->data[*number]]);
     }
     else {
+
         (*number)++;
         StackPush(&my_cpu->stack_cpu, *(Data*)(my_cpu->data + *number));
-        // printf("*(Data*)(my_cpu->data + *number) = %lg\n", *(Data*)(my_cpu->data + *number));
         (*number) += sizeof(Data) - 1;
     }
-    _StackDump(&my_cpu->stack_cpu);
 
 }
 
 void pop(CPU* my_cpu, int* number) {
-    _StackDump(&my_cpu->stack_cpu);
+
     (*number)++;
-    // printf("Number in pop2 = %d\n", *number);
-    // printf("my_cpu->data[%d] = %d\n", *number, my_cpu->data[*number]);
     if (my_cpu->data[*number] == Pop_reg) { 
+
         (*number)++;
-        Data x = StackPop(&my_cpu->stack_cpu);
-        my_cpu->cpu_registers[(int) my_cpu->data[*number]] = x;
+        my_cpu->cpu_registers[(int) my_cpu->data[*number]] = StackPop(&my_cpu->stack_cpu);
     }
     else {
+
         (*number)++;
         StackPop(&my_cpu->stack_cpu);
     }
-    _StackDump(&my_cpu->stack_cpu);
 
 }
 
@@ -90,8 +83,6 @@ void sqrt(stack* stack_cpu) {
 void jmp(CPU* my_cpu, int* number) {
 
     (*number)++;
-
-    // *number = my_cpu->data[*number] - 1;
     *number = *((int*)(my_cpu->data + *number)) - 1;
 }
 
@@ -102,7 +93,7 @@ void jae(CPU* my_cpu, int* number) {
     Data stack_value2 = StackPop(&my_cpu->stack_cpu);
 
     if (stack_value1 >= stack_value2) {
-        
+
         *number = *((int*)(my_cpu->data + *number)) - 1;
     }
     else {
@@ -188,11 +179,9 @@ void je(CPU* my_cpu, int* number) {
 }
 
 void call(CPU* my_cpu, int* number, stack* addresses_for_call) {
-    printf("Number call before = %d\n", *number);
-    printf("Number call after  = %d\n", *number + sizeof(int));
+
     StackPush(addresses_for_call, *number + sizeof(int));
     (*number)++;
-    // *number = my_cpu->data[*number] - 1;
     *number = *((int*)(my_cpu->data + *number)) - 1;
 
 }
@@ -287,6 +276,8 @@ void out(stack* st) {
         StackPop(st);
 
         fprintf(log_txt, "command <out> deleted '%lg' from stack\n", stack_value_out);
+
+        fclose(log_txt);
     }
     else
         printf("Stack is empty\n");
@@ -299,10 +290,9 @@ void hlt(int* number) {
 }
 
 void print(CPU* my_cpu) {
-    printf("WHERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRAERRRRRRRRRRRRRRRRRRRRRRYOUUUUUUUUUUUUU\n");
-    _StackDump(&my_cpu->stack_cpu);
+
     Data last_number_in_stack = StackPop(&my_cpu->stack_cpu);
-    printf("\n%.2lf\n", last_number_in_stack);
+    printf("%.2lf", last_number_in_stack);
     StackPush(&my_cpu->stack_cpu, last_number_in_stack);
 }
 
@@ -322,20 +312,31 @@ int is_equal(Data number1, Data number2) {
     return delta < Epsilon;
 }
 
-void text(CPU* my_cpu, int* number) {
+void db (CPU* my_cpu, int* number) {
 
     (*number)++;
-    int number_of_symbols = 0;
-    while ((int)my_cpu->data[*number] != cpu_text_end) {
+    while(my_cpu->data[(*number)] != '^') {
+        if (my_cpu->data[(*number)] == '_') {
+            printf(" ");
+        }
+        else if (my_cpu->data[(*number)] == '\\') {
+            (*number)++;
+            if (my_cpu->data[(*number)] == 'n') {
+                printf("\n");
+            }
+            else if (my_cpu->data[(*number)] == 't') {
+                printf("\t");
+            }
+            else if (my_cpu->data[(*number)] == 'v') {
+                printf("\v");
+            }
+        }
+        else {
+            printf("%c", my_cpu->data[(*number)]);
+        }
 
-        push(my_cpu, number);
-        (*number) ++;
-        number_of_symbols++;
+        (*number)++;
     }
-    for (int current_symbol = 0; current_symbol < number_of_symbols; current_symbol++) {
-        printf("%c", (int)StackPop(&my_cpu->stack_cpu));
-    }
-
 }
 
 void Destructor(CPU* my_cpu) {
@@ -346,5 +347,5 @@ void Destructor(CPU* my_cpu) {
 
 void meow() {
 
-    printf("\nmeeeow\n\n");
+    printf("\nmeeeow (Poltorashka forever!!!)\n\n");
 }

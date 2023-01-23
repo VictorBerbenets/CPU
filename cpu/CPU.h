@@ -90,8 +90,6 @@ void out(stack* st);
 
 void div(stack* st);
 
-void meow();
-
 void print(CPU* my_cpu);
 
 void sqrt(stack* stack_cpu);
@@ -102,8 +100,10 @@ void error(CPU* my_cpu, int number);
 
 int is_equal(Data number1, Data number2); 
 
-void text(CPU* my_cpu, int* number);
+void db (CPU* cpu, int* number);
 
 void Destructor(CPU* my_cpu);
+
+void meow();
 
 #endif
