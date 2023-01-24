@@ -46,20 +46,18 @@ token*  FillStruct (buffer* asm_commands) {
     ASSERT(asm_commands->buf != nullptr);
 
     size_t number_of_commands = CountComands (asm_commands);
-    printf("numbercom = %zd\n", number_of_commands);
     token* tokens = (token*) calloc(number_of_commands, sizeof(token));
     ASSERT(tokens != nullptr);
 
-    printf("buf = <%s>\n", asm_commands->buf);
     tokens[0].string = strtok(asm_commands->buf, separates_symbols);
 
     char* string      = nullptr;
     size_t tokens_number = 1;
     while(tokens_number != number_of_commands) {
-        printf("tokens[%zd].string = <%s>\n", tokens_number - 1, tokens[tokens_number - 1].string);
 
         string = strtok (NULL, separates_symbols);
         if (string != nullptr) {
+
             tokens[tokens_number].string = string;
             tokens_number++;
         }
@@ -68,11 +66,11 @@ token*  FillStruct (buffer* asm_commands) {
         }
     }
 
-    printf("tokens_number = %zd\n", tokens_number);
     asm_commands->numbers_of_strings = tokens_number;
 
     return tokens;
 }
+
 
 size_t CountComands (buffer* asm_commands) {
 
@@ -124,10 +122,9 @@ void CheckingForCorrectData (buffer* asm_commands, int* count_errors) {
     char** pts = nullptr;
     Constructor(asm_commands, &pts);
 
-    for (size_t string_number = 0; string_number < asm_commands->numbers_of_strings; string_number++) { //string_number < asm_commands->numbers_of_strings
+    for (size_t string_number = 0; string_number < asm_commands->numbers_of_strings; string_number++) { 
         ValidationOfInputData(pts[string_number], string_number, count_errors);
     }
-    printf("commands = <%zd>\n", asm_commands->numbers_of_strings);
     free(pts);
 }
 
@@ -287,15 +284,30 @@ int GiveRegistor(char* command) {
 
     ASSERT(tokens != nullptr);
     ASSERT(asm_commands != nullptr);
-    char arr[] = "push pop";
+
+    char push_or_pop[] = "push pop";
+    char label_com[]   = "jmp jne je jae ja jb jbe call";
     int labels_value   = 0;
+
     for (size_t number = 0; number < asm_commands->numbers_of_strings; number++, labels_value++) {
-        if (number >= 2 && strstr(arr, tokens[number - 2].string)) {
-                labels_value++;
+        if (number >= 2 && strstr(push_or_pop, tokens[number - 2].string)) {
+            if (!strstr(register_arguments, tokens[number - 1].string) && !strcmp("push",tokens[number - 2].string)) {
+                labels_value += sizeof(Data);
+            }
+            else {
+                labels_value ++;
+            }
+        }
+        if (strstr(label_com, tokens[number].string)) {
+            labels_value += sizeof(int) - 1;
+        }
+        if (number >= 1 && !strcmp("db", tokens[number - 1].string)) {
+
+            labels_value += strlen(tokens[number].string) - 3;
         }
         if (!strcmp("L", tokens[number].string)) {
             number++;
-            labels_value --;
+            labels_value--;
             Labels[atoi(tokens[number].string)] = labels_value + 1;
         }
     }
@@ -314,34 +326,37 @@ int GiveRegistor(char* command) {
  }
 
 void MarkRegisterCommand( char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command) {
-    printf("TTTTTTTTTTTTTTTTTTTTest_number BBBBBBBBBBefore = <%zd>\n", *test_bin_number);
+
     int reg = GiveRegistor(command);
     *(*test_bin_commands + *test_bin_number) = (char) Push_reg;
 
     (*test_bin_number)++;
-    printf("How memory i give = %zd\n", *size);
     (*size) ++;
     *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
-    printf("How memory i give = %zd\n", *size);
 
-
-    
     *(*test_bin_commands + *test_bin_number) = (char) reg;
-    printf("TTTTTTTTTTTTTTTTTTTTest_number AAAAAAAAAAAAAAAAafter = <%zd>\n", *test_bin_number);
 }
 
 void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command) {
 
-    if (*((*test_bin_commands) + *test_bin_number - 1) == asm_push || *((*test_bin_commands) + *test_bin_number - 1) == asm_pop) {
+    if (*((*test_bin_commands) + *test_bin_number - 1) == asm_push) {
 
         *(*test_bin_commands + *test_bin_number) = 0;
         (*test_bin_number) ++;
-
         *size              += sizeof(Data) + 1;
         *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+
         *(Data*)(*test_bin_commands + *test_bin_number) = atof(command);
         (*test_bin_number) += sizeof(Data) - 1;
 
+    }
+    else {
+
+        *size             += sizeof(int) + 1;
+        *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+
+        *(int*)(*test_bin_commands + *test_bin_number) = atoi(command);
+        (*test_bin_number) += sizeof(int) - 1;
     }
 }
 
@@ -349,17 +364,17 @@ void GetTextInArray (char ** test_bin_commands, size_t* test_bin_number, char* t
 
     char* string_ptr   = text_string;
     *size             += strlen(text_string);
+
     *test_bin_commands = (char*) realloc(*test_bin_commands, (*size) * sizeof(char));
     string_ptr ++;
 
     while (*string_ptr != '^') {
         *(*test_bin_commands + *test_bin_number) = *string_ptr;
-        printf("arr[%zd] = <%c>\n", *test_bin_number, *(*test_bin_commands + *test_bin_number));
         string_ptr ++;
         (*test_bin_number) ++;
     }
 
-    *(*test_bin_commands + *test_bin_number) = *string_ptr;
+    *(*test_bin_commands + *test_bin_number) = *(string_ptr);
 }
 
 int IsLabelCommand(const char* command) {

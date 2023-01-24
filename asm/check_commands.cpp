@@ -2,11 +2,13 @@
 #include "labels.h"
 
 
-#define Grey "\033[0m"
-#define Red  "\033[0;31m"
+#define Grey   "\033[0m"
+#define Red    "\033[0;31m"
+#define White  "\033[1m"
+#define Blue   "\033[0;36m"
+#define Under  "\033[4m"
 
 void Check_Push(char** pt, int line, char* string, int* count_errors ) {
-
     Data argument  = 0;
     int value     = 0;
     int symb      = 0;
@@ -264,34 +266,44 @@ void Check_label(char** pt, int line, char* string, int* count_errors ) {
     else  PrintErrorForCommand(line, string, pt, count_errors, 0, 1, INVALID_ARGUMENT_OF_LABEL3); 
 }
 
+void SkipSpaces(char*** pt) {
+
+    while (***pt == ' ') {
+        (**pt)++;
+    }
+}
 
 void Check_db (char** pt, int line, char* string, int* count_errors) {
-    while (**pt == ' ') {
-        (*pt)++;
-    }
+    printf("STRLEN = %d\n", Strlen(*pt));
+    SkipSpaces(&pt);
 
     if (**pt != '\"') {
-        fprintf(stderr, ""Red"err1 "Grey"\n");
+        fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
+        fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '\"' after 'db' as the start of the text(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"%s"Grey"\n\n",__FILE__, __LINE__, line, string);
         *count_errors += 1;
         return ;
     }
-
-    while (**pt != '^') {
-        printf("*pt = <%c>\n", **pt);
-        (*pt) ++;
-    }
-    
     printf("STRLEN = %d\n", Strlen(*pt));
-    if (Strlen(++(*pt)) != sizeof('\"')) {
-        fprintf(stderr, ""Red"error "Grey"\n");
+    if (*(*pt + Strlen(*pt) - 1) != '\"') {
+        fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
+        fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '\"' in the end of the text (error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t|\t%s"Grey"\n\t|\n",__FILE__, __LINE__, line, string);
         *count_errors += 1;
 
+    if (*(*pt + Strlen(*pt) - 1) != '^') {
+        fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
+        fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '^' in the end of the text before '\"'(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t|\t%s"Grey"\n\t|\n",__FILE__, __LINE__, line, string);
+        *count_errors += 1;
     }
-
-    else if (**pt != '\"') {
-        fprintf(stderr, ""Red"err3 "Grey"\n");
-        *count_errors += 1;
-
+    }
+    while (**pt != '^' && **pt != '\0') {
+        printf("*pt = <%c>\n", **pt);
+        if (**pt == ' ') {
+        fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
+        fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"you can't use symbol ' ', instead of it use '_', please(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t\t%s"Grey"\n\n",__FILE__, __LINE__, line, string);
+            *count_errors += 1;
+            return ;
+        }
+        (*pt) ++;
     }
 }
 

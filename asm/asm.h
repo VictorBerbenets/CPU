@@ -103,8 +103,6 @@ void CheckingForCorrectData (buffer* asm_commands, int* count_errors) ;
 
 void Constructor (buffer* asm_commands, char*** pts);
 
-// void Destructor (buffer* asm_commands, token** toks, Data** test_bin_commands);
-
 void Destructor (buffer* asm_commands, token** toks, char** test_bin_commands);
 
 void Replacement (buffer* asm_commands);
@@ -147,10 +145,6 @@ void Check_call (char** pt, int line, char* string, int* count_errors);
 
 void PrintErrorForCommand(int line, char* string, char** pt, int* count_errors, int argument, int numbers_of_errors, ...);
 
-// void MarkRegisterCommand(Data** test_bin_commands, size_t* test_bin_number, size_t* number_of_elements_to_fread, char* command);
-
-// void MarkNotRegisterCommand(Data** test_bin_commands, size_t* test_bin_number, size_t* number_of_elements_to_fread);
-
 void MarkRegisterCommand(char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command);
 
 void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command);
@@ -158,6 +152,8 @@ void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, s
 void GetTextInArray (char** test_bin_commands, size_t* test_bin_number, char* text_string, size_t* size);
 
 void Check_db (char** pt, int line, char* string, int* count_errors);
+
+void SkipSpaces(char*** pointer);
 
 void foo(int line);
 
