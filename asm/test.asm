@@ -1,35 +1,10 @@
 
-text_begin
-
-push 32
-push 58
-push 114
-push 101
-push 116
-push 110
-push 69
-push 10
-push 108
-push 97
-push 105
-push 114
-push 111
-push 116
-push 99
-push 97
-push 70
-push 10
-
-text_end
+db "Factorial._Enter_the_number_^"
 
 in
 pop ax
 
-text_begin
-
-push 10
-
-text_end
+db "\n^"
 
 push 1
 pop bx
@@ -45,23 +20,11 @@ push ax
 print 
 out
 
-text_begin
-
-push 32
-push 61
-push 32
-push 33
-
-
-text_end
+db "!_=_^"
 
 print
 
-text_begin
-
-push 10
-
-text_end
+db "\n^"
 
 hlt
 
