@@ -1,8 +1,9 @@
+                                            #This programm solve linear equation
+                                            
+db "Enter coefficients of quadratic equation:\n^"                                                 
 
-db "Enter_coefficients_of_quadratic_equation\n^"
 
-
-in 
+in
 pop ax
 in
 pop bx
@@ -25,7 +26,7 @@ jne : 3
 
 # Infinite Roots
 
-db "Infinite_roots\n^" 
+db "Infinite roots\n^"
 
 hlt
 
@@ -33,7 +34,7 @@ hlt
 
 # NO ROOTS
 
-db "No_Roots\n^"
+db "No Roots\n^"
 
 hlt
 
@@ -45,7 +46,12 @@ push cx
 push -1
 mul
 div
+
+db "linear equation. Its root: ^"
+
 print
+
+db "\n^"
 
 hlt
 
@@ -80,7 +86,7 @@ jb : 25
 
 # if dx < 0, end programm and print 'No roots'
 
-db "discriminant_<_0_._^"
+db "discriminant < 0 . ^"
 
 call 3    
 hlt
@@ -104,11 +110,11 @@ push dx
 sum
 div
 
-db "first_root_^"
+db "first root: ^"
 
 print
 
-db "___^"
+db ";   ^"
 
 # second Root
 
@@ -124,7 +130,7 @@ sub
 
 div
 
-db "second_root_^"
+db "second root: ^"
 
 print
 
@@ -143,7 +149,7 @@ push bx
 mul
 div
 
-db "discriminant_=_0._The_root_is_^"
+db "discriminant = 0. The root is ^"
 
 print
 

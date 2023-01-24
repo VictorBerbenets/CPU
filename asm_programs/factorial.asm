@@ -1,5 +1,6 @@
-
-db "Factorial._Enter_the_number_^"
+                                        #This programm finds factorial 
+                                        
+db "Factorial. Enter the number: ^"
 
 in
 pop ax
@@ -20,7 +21,7 @@ push ax
 print 
 out
 
-db "!_=_^"
+db "! = ^"
 
 print
 
