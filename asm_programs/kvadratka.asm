@@ -1,45 +1,6 @@
 
-# the name of the programm
+db "Enter_coefficients_of_quadratic_equation\n^"
 
-text_begin
-
-push 10
-push 58
-push 99
-push 32
-push 98
-push 32
-push 97
-push 32
-push 114
-push 101
-push 116
-push 110
-push 69
-push 10
-push 110
-push 111
-push 105
-push 116
-push 97
-push 117
-push 113
-push 101
-push 32
-push 99
-push 105
-push 116
-push 97
-push 114
-push 100
-push 97
-push 117
-push 81
-push 10
-
-text_end
-
-# enter a b c
 
 in 
 pop ax
@@ -64,24 +25,7 @@ jne : 3
 
 # Infinite Roots
 
-text_begin 
-
-push 83
-push 84
-push 79
-push 79
-push 82
-push 32
-push 69
-push 84
-push 73
-push 78
-push 73
-push 70
-push 78
-push 73
-
-text_end 
+db "Infinite_roots\n^" 
 
 hlt
 
@@ -89,18 +33,7 @@ hlt
 
 # NO ROOTS
 
-text_begin 
-
-push 83
-push 84
-push 79
-push 79
-push 82
-push 32
-push 79
-push 78
-
-text_end 
+db "No_Roots\n^"
 
 hlt
 
@@ -145,7 +78,9 @@ push dx
 push 0
 jb : 25
 
-# if dx < , end programm and print 'No roots'
+# if dx < 0, end programm and print 'No roots'
+
+db "discriminant_<_0_._^"
 
 call 3    
 hlt
@@ -169,7 +104,11 @@ push dx
 sum
 div
 
+db "first_root_^"
+
 print
+
+db "___^"
 
 # second Root
 
@@ -184,7 +123,12 @@ mul
 sub
 
 div
+
+db "second_root_^"
+
 print
+
+db "\n^"
 
 hlt
 
@@ -199,7 +143,11 @@ push bx
 mul
 div
 
+db "discriminant_=_0._The_root_is_^"
+
 print
+
+db "\n^"
 
 meow
 
