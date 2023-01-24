@@ -1,7 +1,6 @@
 #include "asm.h"
 
-const int labels_commands_size = 200;
-const char labels_commands[labels_commands_size] = "call jmp jb jbe ja jae je jne";
+const char labels_commands[] = "call jmp jb jbe ja jae je jne";
 
 
 size_t getFileSize (const char *file) { 
@@ -286,7 +285,6 @@ int GiveRegistor(char* command) {
     ASSERT(asm_commands != nullptr);
 
     char push_or_pop[] = "push pop";
-    char label_com[]   = "jmp jne je jae ja jb jbe call";
     int labels_value   = 0;
 
     for (size_t number = 0; number < asm_commands->numbers_of_strings; number++, labels_value++) {
@@ -298,7 +296,7 @@ int GiveRegistor(char* command) {
                 labels_value ++;
             }
         }
-        if (strstr(label_com, tokens[number].string)) {
+        if (strstr(labels_commands, tokens[number].string)) {
             labels_value += sizeof(int) - 1;
         }
         if (number >= 1 && !strcmp("db", tokens[number - 1].string)) {

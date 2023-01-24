@@ -274,7 +274,6 @@ void SkipSpaces(char*** pt) {
 }
 
 void Check_db (char** pt, int line, char* string, int* count_errors) {
-    printf("STRLEN = %d\n", Strlen(*pt));
     SkipSpaces(&pt);
 
     if (**pt != '\"') {
@@ -283,7 +282,6 @@ void Check_db (char** pt, int line, char* string, int* count_errors) {
         *count_errors += 1;
         return ;
     }
-    printf("STRLEN = %d\n", Strlen(*pt));
     if (*(*pt + Strlen(*pt) - 1) != '\"') {
         fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
         fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '\"' in the end of the text (error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t|\t%s"Grey"\n\t|\n",__FILE__, __LINE__, line, string);
@@ -296,7 +294,6 @@ void Check_db (char** pt, int line, char* string, int* count_errors) {
     }
     }
     while (**pt != '^' && **pt != '\0') {
-        printf("*pt = <%c>\n", **pt);
         if (**pt == ' ') {
         fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
         fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"you can't use symbol ' ', instead of it use '_', please(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t\t%s"Grey"\n\n",__FILE__, __LINE__, line, string);
