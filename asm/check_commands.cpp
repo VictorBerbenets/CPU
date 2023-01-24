@@ -274,33 +274,38 @@ void SkipSpaces(char*** pt) {
 }
 
 void Check_db (char** pt, int line, char* string, int* count_errors) {
+
+    char end_text_symb      = '^';
+    char is_end_symb_finded = 0;
+
     SkipSpaces(&pt);
 
     if (**pt != '\"') {
         fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
-        fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '\"' after 'db' as the start of the text(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"%s"Grey"\n\n",__FILE__, __LINE__, line, string);
+        fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '\"' after 'db' as the start of the text(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t|\t%s"Grey"\n\t|\n",__FILE__, __LINE__, line, string);
         *count_errors += 1;
         return ;
     }
-    if (*(*pt + Strlen(*pt) - 1) != '\"') {
+
+    while (**pt != '\0') {
+
+        if (**pt == end_text_symb) {
+            is_end_symb_finded = 1;
+            break;
+        }
+        (*pt)++;
+    }
+    (*pt)++;
+
+    if (is_end_symb_finded == 0) {
+        fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
+        fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '%c' in the end of the text before '\"'(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t|\t%s"Grey"\n\t|\n",__FILE__, __LINE__, end_text_symb, line, string);
+        *count_errors += 1;
+    }
+    else if (**pt != '"') {
         fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
         fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '\"' in the end of the text (error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t|\t%s"Grey"\n\t|\n",__FILE__, __LINE__, line, string);
         *count_errors += 1;
-
-    if (*(*pt + Strlen(*pt) - 1) != '^') {
-        fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
-        fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '^' in the end of the text before '\"'(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t|\t%s"Grey"\n\t|\n",__FILE__, __LINE__, line, string);
-        *count_errors += 1;
-    }
-    }
-    while (**pt != '^' && **pt != '\0') {
-        if (**pt == ' ') {
-        fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n",__FILE__, __LINE__, __PRETTY_FUNCTION__);
-        fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"you can't use symbol ' ', instead of it use '_', please(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n"Blue"\t\t%s"Grey"\n\n",__FILE__, __LINE__, line, string);
-            *count_errors += 1;
-            return ;
-        }
-        (*pt) ++;
     }
 }
 

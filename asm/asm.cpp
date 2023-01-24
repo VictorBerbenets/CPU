@@ -4,6 +4,7 @@ const int Labels_size          = 512;
 int Labels[Labels_size]        = {};
 
 int main() {
+
     memset(Labels, -1, sizeof(int) * Labels_size);
 
     buffer asm_commands = {} ;
@@ -34,7 +35,7 @@ int main() {
         test_bin_commands[test_bin_number] = (char) value;    \
         } else                       
 
-    for ( ; command_number < asm_commands.numbers_of_strings; command_number++, test_bin_number++) { 
+    for ( ; command_number < (int)asm_commands.numbers_of_strings; command_number++, test_bin_number++) { 
 
         command = tokens[command_number].string;
 

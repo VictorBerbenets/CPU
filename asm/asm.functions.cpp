@@ -1,6 +1,7 @@
 #include "asm.h"
 
-const char labels_commands[] = "call jmp jb jbe ja jae je jne";
+const char Labels_commands[] = "call jmp jb jbe ja jae je jne";
+const char Text_command[]    = "db";
 
 
 size_t getFileSize (const char *file) { 
@@ -52,22 +53,55 @@ token*  FillStruct (buffer* asm_commands) {
 
     char* string      = nullptr;
     size_t tokens_number = 1;
-    while(tokens_number != number_of_commands) {
 
-        string = strtok (NULL, separates_symbols);
-        if (string != nullptr) {
-
-            tokens[tokens_number].string = string;
-            tokens_number++;
-        }
-        else {
-            break;
-        }
-    }
+    FillToks(&tokens_number, number_of_commands, &tokens, string);
 
     asm_commands->numbers_of_strings = tokens_number;
 
     return tokens;
+}
+
+void FillToks(size_t* tokens_number, size_t number_of_commands, token** tokens, char* string) {
+
+    while(*tokens_number != number_of_commands) {
+
+        if (!strcmp((*tokens)[*tokens_number - 1].string, Text_command)) {
+            string = strtok(nullptr, "\n");
+
+            if (string != nullptr) {
+            
+            SkipFirstSpacesInText(&string);
+            (*tokens)[*tokens_number].string = string;
+            (*tokens_number)++;
+            }
+            else { break; }
+        }
+        else {
+        
+            string = strtok (nullptr, separates_symbols);
+            if (string != nullptr) {
+
+                (*tokens)[*tokens_number].string = string;
+                (*tokens_number)++;
+            }
+            else { break; }
+        }
+    }
+}
+
+void SkipFirstSpacesInText(char** string) {
+
+    while (**string != '\"') {
+        (*string)++;
+    }
+
+    char* string_ptr = *string;
+    while (*string_ptr != '^') {
+        string_ptr ++;
+    }
+
+    string_ptr += 2;
+    *string_ptr = '\0';
 }
 
 
@@ -193,7 +227,7 @@ void Constructor(buffer* asm_commands, char*** pts) {
     size_t buf_size         = asm_commands->buf_size;
     size_t number_of_string = 0;
     size_t symbols          = 0;
-
+    
     for (size_t symbols_in_one_string = 0; symbols < buf_size; is_eof++, symbols ++) { 
 
         if (*is_eof != '\n' && *is_eof != '\0') {
@@ -296,7 +330,7 @@ int GiveRegistor(char* command) {
                 labels_value ++;
             }
         }
-        if (strstr(labels_commands, tokens[number].string)) {
+        if (strstr(Labels_commands, tokens[number].string)) {
             labels_value += sizeof(int) - 1;
         }
         if (number >= 1 && !strcmp("db", tokens[number - 1].string)) {
@@ -379,7 +413,7 @@ int IsLabelCommand(const char* command) {
 
     ASSERT(command != nullptr);
 
-    if (strstr(labels_commands, command) != nullptr) {
+    if (strstr(Labels_commands, command) != nullptr) {
 
         return 1;
     }

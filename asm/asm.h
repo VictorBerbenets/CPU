@@ -97,6 +97,8 @@ size_t CountComands (buffer* asm_commands);
 
 token* FillStruct (buffer* asm_commands);
 
+void FillToks(size_t* tokens_number, size_t number_of_commands, token** tokens, char* string);
+
 void ReplacingArgumentsInJmp (token* toks, buffer* asm_commands, int* labels);
 
 void CheckingForCorrectData (buffer* asm_commands, int* count_errors) ;
@@ -152,6 +154,8 @@ void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, s
 void GetTextInArray (char** test_bin_commands, size_t* test_bin_number, char* text_string, size_t* size);
 
 void Check_db (char** pt, int line, char* string, int* count_errors);
+
+void SkipFirstSpacesInText(char** string);
 
 void SkipSpaces(char*** pointer);
 
