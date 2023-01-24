@@ -316,10 +316,8 @@ void db (CPU* my_cpu, int* number) {
 
     (*number)++;
     while(my_cpu->data[(*number)] != '^') {
-        if (my_cpu->data[(*number)] == '_') {
-            printf(" ");
-        }
-        else if (my_cpu->data[(*number)] == '\\') {
+
+        if (my_cpu->data[(*number)] == '\\') {
             (*number)++;
             if (my_cpu->data[(*number)] == 'n') {
                 printf("\n");
