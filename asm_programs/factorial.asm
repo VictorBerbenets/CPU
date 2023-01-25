@@ -7,7 +7,7 @@ pop ax
 
 db "\n^"
 
-push 1
+push 0
 pop bx
 
 push 1
