@@ -179,20 +179,20 @@ void ValidationOfInputData(char* string, int line, int* count_errors) {
     }
     switch (res) {
 
-        case asm_push:      Check_Push(&pt, line, string, count_errors);                                break;
-        case asm_pop:       Check_Pop_Reg(&pt, line, string, count_errors);                             break;     
-        case asm_jmp:       Check_Jmp(&pt, line, string, count_errors);                                 break;
-        case asm_jbe:       Check_Jmp(&pt, line, string, count_errors);                                 break;
-        case asm_jae:       Check_Jmp(&pt, line, string, count_errors);                                 break;
-        case asm_jne:       Check_Jmp(&pt, line, string, count_errors);                                 break;
-        case asm_je:        Check_Jmp(&pt, line, string, count_errors);                                 break;
-        case asm_ja:        Check_Jmp(&pt, line, string, count_errors);                                 break;
-        case asm_jb:        Check_Jmp(&pt, line, string, count_errors);                                 break;
-        case asm_call:      Check_call(&pt, line, string, count_errors);                                break;
-        case asm_out_text:  Check_call(&pt, line, string, count_errors);                                break;
-        case asm_label:     Check_label(&pt, line, string, count_errors);                               break;
-        case asm_db:        Check_db   (&pt, line, string, count_errors);                               break;
-        case UNCORRECTDATA: PrintErrorForCommand(line, string, 0, count_errors, 0, 1, INVALID_COMMAND); break;
+        case asm_push:      Check_Push(&pt, line, string, count_errors);                                                  break;
+        case asm_pop:       Check_Pop_Reg(&pt, line, string, count_errors);                                               break;     
+        case asm_jmp:       Check_Jmp(&pt, line, string, count_errors);                                                   break;
+        case asm_jbe:       Check_Jmp(&pt, line, string, count_errors);                                                   break;
+        case asm_jae:       Check_Jmp(&pt, line, string, count_errors);                                                   break;
+        case asm_jne:       Check_Jmp(&pt, line, string, count_errors);                                                   break;
+        case asm_je:        Check_Jmp(&pt, line, string, count_errors);                                                   break;
+        case asm_ja:        Check_Jmp(&pt, line, string, count_errors);                                                   break;
+        case asm_jb:        Check_Jmp(&pt, line, string, count_errors);                                                   break;
+        case asm_call:      Check_call(&pt, line, string, count_errors);                                                  break;
+        case asm_out_text:  Check_call(&pt, line, string, count_errors);                                                  break;  
+        case asm_label:     Check_label(&pt, line, string, count_errors);                                                 break;
+        case asm_db:        Check_db   (&pt, line, string, count_errors);                                                 break;
+        case UNCORRECTDATA: PrintErrorForCommand(__FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_COMMAND); break;
         default:            Check_Command_Without_Argument(&pt, line, string, count_errors);            
     }
 }
