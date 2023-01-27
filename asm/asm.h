@@ -71,6 +71,9 @@ enum ASM_errors {
     INVALID_ARGUMENT_OF_LABEL3 = (1 << 8),
     ERROR_IN_FILE              = -0xFAAACE1,
     CORRECTDATA                =  0xDEDFEED1,
+    INVALID_TEXT1              =  0xDED1,
+    INVALID_TEXT2              =  0xDED2,
+    INVALID_TEXT3              =  0xDED3,
     UNCORRECTDATA              =  0XDED02,
     ERROR_IN_FWRITE            =  0XDED03,
     ERROR_IN_OPEN_FILE         =  0XDED04,
@@ -145,7 +148,7 @@ void Check_label(char** pt, int line, char* string, int* count_errors);
 
 void Check_call (char** pt, int line, char* string, int* count_errors);
 
-void PrintErrorForCommand(int line, char* string, char** pt, int* count_errors, int argument, int numbers_of_errors, ...);
+void PrintErrorForCommand(const char* func, int _line_, int line, char* string, int* count_errors, int numbers_of_errors, ...);
 
 void MarkRegisterCommand(char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command);
 
@@ -160,6 +163,8 @@ void SkipFirstSpacesInText(char** string);
 void SkipSpaces(char*** pointer);
 
 void foo(int line);
+
+
 
 #endif
 
