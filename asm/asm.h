@@ -9,8 +9,10 @@
 #include <sys/types.h>
 #include <stdarg.h>
 
+#include "colors.h"
 #include "my_assert.h"
 #include "registers.h"
+
 
 typedef double Data;
 

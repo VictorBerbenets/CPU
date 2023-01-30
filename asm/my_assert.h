@@ -1,10 +1,12 @@
+#ifndef My_assert
+#define My_assert
 
+#define ASSERT(expression, ...)                                                                                         \
+        if (!(expression)) {                                                                                             \
+        fprintf(stderr, ""White"%s:%d:"Grey"In function "White" '%s': "Grey" \n", __FILE__, __LINE__, __FUNCTION__);  \
+        fprintf(stderr, ""White"%s:%d:"Red"error:"Grey"Assert expression is false\n\t| "Blue" \t%s "Grey" "          \
+        "\n\t|\n", __FILE__, __LINE__, #expression);                                                                        \
+        __VA_ARGS__;                                                                                                         \
+    }                                                                                                                                                                                   
 
-#define ASSERT(expression, ...)                                                          \
-        if (!(expression)) {                                                             \
-        fprintf(stderr, "in file <%s>: \033[0;31merror\033[0m in line '%d'\n"            \
-                "the exspression \"%s\" is false\n\n", __FILE__, __LINE__, #expression); \
-        __VA_ARGS__;                                                                     \
-    }                                                                                    
-
-
+#endif

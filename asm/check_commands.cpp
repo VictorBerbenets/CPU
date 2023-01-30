@@ -1,13 +1,6 @@
 #include "asm.h"
 #include "labels.h"
 
-
-#define Grey   "\033[0m"
-#define Red    "\033[0;31m"
-#define White  "\033[1m"
-#define Blue   "\033[0;36m"
-#define Under  "\033[4m"
-
 char End_text_symb      = '^';
 
 
@@ -279,22 +272,22 @@ int Is_Label(char* string) {
 
     for (int current_number = 0; current_number < numbers_of_errors; current_number++) {
 
-        fprintf(stderr, ""White"%s:%d:"Grey"In function "White"'%s':"Grey"\n", __FILE__, _line_, func);
+        fprintf(stderr, " "White" %s:%d: "Grey" In function "White" '%s': "Grey" \n", __FILE__, _line_, func);
         switch(va_arg(ptr, int)) {
             case MISSING_ARGUMENT:             
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"Missing argument for command. This command needs argument(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, " "White" %s:%d: "Red" error: "Grey" Missing argument for command. This command needs argument(error was in line: "Under" %d "Grey" in the \"test_asm\" file).\n\t| "Blue" \t%s "Grey" \n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_ARGUMENT;
                 break;
             case INVALID_SYMBOLS:             
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"Invalid input. Invalid symbols(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, " "White" %s:%d: "Red" error: "Grey" Invalid input. Invalid symbols(error was in line: "Under" %d "Grey" in the \"test_asm\" file).\n\t| "Blue" \t%s "Grey" \n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_SYMBOLS;
                 break;
             case INVALID_ARGUMENT:             
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"Invalid data. Argument of the command must be a number(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, " "White" %s:%d:"Red" error: "Grey" Invalid data. Argument of the command must be a number(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_ARGUMENT;
                 break;
             case INVALID_DATA:             
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"Invalid data. Argument \"jmp\" must be like: \": 'number'\"(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, " "White" %s:%d:"Red" error: "Grey"Invalid data. Argument \"jmp\" must be like: \": 'number'\"(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_DATA;
                 break;
             case INVALID_COMMAND:             

@@ -23,7 +23,7 @@ int main() {
     char* command                      = nullptr;
     size_t size = asm_commands.numbers_of_strings;
     char* test_bin_commands            = (char*) calloc(size, sizeof(char));
-
+    
     ASSERT(test_bin_commands != nullptr, return MEMORY_ALLOCATION_ERROR);
 
     int value               = 0;

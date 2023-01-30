@@ -1,3 +1,5 @@
+#ifndef My_registers
+#define My_registers
 
 enum registers_arguments{
     ax = 1,
@@ -7,3 +9,5 @@ enum registers_arguments{
     ex = 5,
     fx = 6
 } ;
+
+#endif
