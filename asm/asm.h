@@ -16,7 +16,7 @@
 
 typedef double Data;
 
-const int shift_by_8_bytes = 8;
+const int shift_by_8_bytes                = 8;
 
 const int len_registr                     = 2;
 
@@ -76,7 +76,7 @@ enum ASM_errors {
     INVALID_TEXT1              =  0xDED1,
     INVALID_TEXT2              =  0xDED2,
     INVALID_TEXT3              =  0xDED3,
-    UNCORRECTDATA              =  0XDED02,
+    UNCORRECT_DATA             =  0XDED02,
     ERROR_IN_FWRITE            =  0XDED03,
     ERROR_IN_OPEN_FILE         =  0XDED04,
     ERROR_IN_CLOSE_FILE        =  0XDED05,
@@ -130,7 +130,7 @@ int Is_Label(char* string);
 
 int IsLabelCommand(const char* command);
 
-void SkipComments(char** is_eof, size_t* symbols_in_one_string, size_t* symbols, size_t buf_size);
+void SkipComments(char** current_symbol_ptr, size_t* symbols_in_one_string, size_t* symbols, size_t buf_size);
 
 void Check_Command_Without_Argument(char** pt, int line, char* string, int* count_errors);
 
@@ -142,7 +142,7 @@ void Check_Push(char** pt, int line, char* string, int* count_errors);
 
 void Check_Push_Register(char** pt, int line, char* string, int* count_errors );
 
-void Check_Pop_Reg(char** pt, int line, char* string, int* count_errors);
+void Check_Pop(char** pt, int line, char* string, int* count_errors);
 
 void Print_Incorrect_Data(char* data, int line, char* string, int* count_errors);
 

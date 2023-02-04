@@ -30,9 +30,9 @@ int main() {
     int command_number      = 0;
     size_t test_bin_number  = 0;
 
-    #define CMD(cmd) if(!strcmp(#cmd, command)){              \
+    #define CMD(cmd) if(!strcmp(#cmd, command)){             \
         value = asm_##cmd;                                    \
-        test_bin_commands[test_bin_number] = (char) value;    \
+        test_bin_commands[test_bin_number] = (char) value;     \
         } else                       
 
     for ( ; command_number < (int)asm_commands.numbers_of_strings; command_number++, test_bin_number++) { 

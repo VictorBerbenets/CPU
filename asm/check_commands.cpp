@@ -4,39 +4,39 @@
 char End_text_symb      = '^';
 
 
-void Check_Push(char** pt, int line, char* string, int* count_errors ) {
+void Check_Push(char** current_token, int line, char* string, int* count_errors ) {
     Data argument  = 0;
     int value     = 0;
     int symb      = 0;
 
     char* push_reg = (char*) calloc(len_registr + 1, sizeof(char));
 
-    if ((value = sscanf(*pt, "%lg%n", &argument, &symb))) {
+    if ((value = sscanf(*current_token, "%lg%n", &argument, &symb))) {
 
-        *pt += symb;
+        *current_token += symb;
         if (value == -1) {
             PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, MISSING_ARGUMENT); 
         }
-        while (**pt != '\0') {
+        while (**current_token != '\0') {
 
-            if (**pt != ' ') {
+            if (**current_token != ' ') {
                 PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_SYMBOLS); 
                 break;
             }
-        (*pt)++;
+        (*current_token)++;
         }
         free(push_reg);
     }
 
-    else if ((Strlen(*pt) == len_registr)) {
+    else if ((Strlen(*current_token) == len_registr)) {
         int number = 0;
         
-        while (**pt != '\0') {
-            if (**pt != ' ') {
-                push_reg[number] = **pt;
+        while (**current_token != '\0') {
+            if (**current_token != ' ') {
+                push_reg[number] = **current_token;
                 number++;
             }
-        (*pt)++;
+        (*current_token)++;
         }
         if (strstr(register_arguments, push_reg) == nullptr) {      
 
@@ -52,18 +52,19 @@ void Check_Push(char** pt, int line, char* string, int* count_errors ) {
 
 }
 
-void Check_Pop_Reg(char** pt, int line, char* string, int* count_errors ) {
+// check_pop 
+void Check_Pop(char** current_token, int line, char* string, int* count_errors ) {
 
     char* pop_reg = (char*) calloc(len_registr + 1, sizeof(char));
 
-    if ((Strlen(*pt) == len_registr)) {
+    if ((Strlen(*current_token) == len_registr)) {
         int number = 0;
-        while (**pt != '\0') {
-            if (**pt != ' ') {
-                pop_reg[number] = **pt;
+        while (**current_token != '\0') {
+            if (**current_token != ' ') {
+                pop_reg[number] = **current_token;
                 number++;
             }
-        (*pt)++;
+        (*current_token)++;
         }
 
         if (strstr(register_arguments, pop_reg) == nullptr) {
@@ -71,7 +72,7 @@ void Check_Pop_Reg(char** pt, int line, char* string, int* count_errors ) {
         }
         free(pop_reg);
     }
-    else if (!Strlen(*pt)) {
+    else if (!Strlen(*current_token)) {
         
         free(pop_reg);
         return ;
@@ -83,149 +84,180 @@ void Check_Pop_Reg(char** pt, int line, char* string, int* count_errors ) {
 }
 
     
-void Check_Jmp(char** pt, int line, char* string, int* count_errors) {
+void Check_Jmp(char** current_token, int line, char* string, int* count_errors) {
 
     int value    = 0;
     int argument = 0;
     int symb     = 0;
 
-    while (**pt == ' ') {
-        (*pt)++;
+    while (**current_token == ' ') {
+        (*current_token)++;
     }
 
-    if (**pt != ':') {
+    if (**current_token != ':') {
         PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_DATA); 
         return ;
     }
-    (*pt)++;
+    (*current_token)++;
 
-    if ((value = sscanf(*pt, "%d%n", &argument, &symb))) {
+    if ((value = sscanf(*current_token, "%d%n", &argument, &symb))) {
         
-        *pt += symb;
+        *current_token += symb;
 
         if (value == -1) {
             PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, MISSING_ARGUMENT); 
             return ;
         }
         else
-            while (**pt != '\0') {
+            while (**current_token != '\0') {
                 
-                if (**pt != ' ') { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_SYMBOLS); }
-                (*pt)++;
+                if (**current_token != ' ') { 
+                    PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_SYMBOLS); 
+                }
+                (*current_token)++;
             }
     }
     else { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT); }
 }
 
-void Check_Command_Without_Argument(char** pt, int line, char* string, int* count_errors ) {
+void Check_Command_Without_Argument(char** current_token, int line, char* string, int* count_errors ) {
 
-    while (**pt != '\0') {
-        if (**pt != ' ') {
+    while (**current_token != '\0') {
+        if (**current_token != ' ') {
             PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_SYMBOLS); 
             break;
         }
-    (*pt)++;
+    (*current_token)++;
     }
 }
 
-int Check_First_Command(char** pt, char* data, int line, char* string, int* count_errors) {
+int Check_First_Command(char** current_token, char* data, int line, char* string, int* count_errors) {
 
     int symb      = 0;
 
-    if (!sscanf(*pt, "%s%n", data, &symb) && symb != 0) { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_COMMAND);}
+    if (!sscanf(*current_token, "%s%n", data, &symb) && symb != 0) { 
+        PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_COMMAND);
+    }
 
     if (symb == 0) {
+        //empty string error
         return ERROR;
     }
 
     if (Is_Label(string)) {
-        return IsCorrectData((char*) "label");
+        return asm_label;    //IsCorrectData((char*) "label")
     }
 
-    *pt += symb;
+    *current_token += symb;
     return IsCorrectData(data);
 }
 
-void Check_call (char** pt, int line, char* string, int* count_errors ) {
+void Check_call (char** current_token, int line, char* string, int* count_errors ) {
 
     int symb      = 0;
     int argument  = 0;
     int value     = 0;
 
-    if ((value = sscanf(*pt, "%d%n", &argument, &symb))) {
-        *pt += symb;
-        if (value == -1) { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, MISSING_ARGUMENT); }
+    if ((value = sscanf(*current_token, "%d%n", &argument, &symb))) {
+        *current_token += symb;
+        if (value == -1) { 
+            PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, MISSING_ARGUMENT); 
+        }
         if (value != -1) {
 
-            if (!(argument >= Min_Label_Value && argument <= Max_Label_Value)) { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT); }
+            if (!(argument >= Min_Label_Value && argument <= Max_Label_Value)) { 
+                PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT); 
+            }
         }
-        while (**pt != '\0') {
+        while (**current_token != '\0') {
 
-            if (**pt != ' ') { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_SYMBOLS); }
-            (*pt)++;
+            if (**current_token != ' ') { 
+                PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_SYMBOLS); 
+            }
+            (*current_token)++;
         }
     }
-else { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT); }
+else { 
+    PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT); 
+    }
 }
 
 
-void Check_label(char** pt, int line, char* string, int* count_errors ) {
+void Check_label(char** current_token, int line, char* string, int* count_errors ) {
 
     int value    = 0;
     int argument = 0;
     int symb     = 0;
 
-    while (**pt != 'L' && **pt != '\0') (*pt)++; 
-    (*pt)++;
+    while (**current_token != 'L' && **current_token != '\0') { (*current_token)++; }
+    (*current_token)++;
     
-    if (**pt != ' ') { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT_OF_LABEL0); }
+    if (**current_token != ' ') {
+        PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT_OF_LABEL0);
+    }
 
-    if ((value = sscanf(*pt, "%d%n", &argument, &symb))) {
-        *pt += symb;
+    if ((value = sscanf(*current_token, "%d%n", &argument, &symb))) {
+        *current_token += symb;
 
-        if (value == -1) {PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, MISSING_ARGUMENT); }
+        if (value == -1) { 
+            PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, MISSING_ARGUMENT); 
+        }
 
         if (value != -1) {
-            if (!(argument >= Min_Label_Value && argument <= Max_Label_Value)) { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT_OF_LABEL1); }
-            else if (current_labels[argument] == argument)                     { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT_OF_LABEL2); }
+            if (!(argument >= Min_Label_Value && argument <= Max_Label_Value)) { 
+                PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT_OF_LABEL1); 
+            }
+            else if (current_labels[argument] == argument) { 
+                PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT_OF_LABEL2);
+            }
             else { current_labels[argument] = argument; }
         }
-        while (**pt != '\0') {
+        while (**current_token != '\0') {
 
-            if (**pt != ' ') { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_SYMBOLS); break; }
-            (*pt)++;
+            if (**current_token != ' ') { 
+                PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_SYMBOLS); break;
+            }
+            (*current_token)++;
         }
     }
-    else  { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT_OF_LABEL3); }
-}
-
-void SkipSpaces(char*** pt) {
-
-    while (***pt == ' ') {
-        (**pt)++;
+    else  { 
+        PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_ARGUMENT_OF_LABEL3);
     }
 }
 
-void Check_db (char** pt, int line, char* string, int* count_errors) {
+void SkipSpaces(char*** current_token) {
+
+    while (***current_token == ' ') {
+        (**current_token)++;
+    }
+}
+
+void Check_db (char** current_token, int line, char* string, int* count_errors) {
 
     char is_end_symb_finded = 0;
 
-    SkipSpaces(&pt);
+    SkipSpaces(&current_token);
 
-    if (**pt != '\"') { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_TEXT1); }
+    if (**current_token != '\"') { 
+        PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_TEXT1); 
+    }
 
-    while (**pt != '\0') {
+    while (**current_token != '\0') {
 
-        if (**pt == End_text_symb) {
+        if (**current_token == End_text_symb) {
             is_end_symb_finded = 1;
             break;
         }
-        (*pt)++;
+        (*current_token)++;
     }
-    (*pt)++;
+    (*current_token)++;
 
-    if (is_end_symb_finded == 0) { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_TEXT2); }
-    else if (**pt != '"')        { PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_TEXT3); }
+    if (is_end_symb_finded == 0) { 
+        PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_TEXT2); 
+    }
+    else if (**current_token != '"')        { 
+        PrintErrorForCommand(__PRETTY_FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_TEXT3); 
+    }
 }
 
 //return number of not space's symbols
@@ -272,54 +304,66 @@ int Is_Label(char* string) {
 
     for (int current_number = 0; current_number < numbers_of_errors; current_number++) {
 
-        fprintf(stderr, " "White" %s:%d: "Grey" In function "White" '%s': "Grey" \n", __FILE__, _line_, func);
+        fprintf(stderr, "" White " %s:%d: " Grey " In function" White " '%s': " Grey " \n", __FILE__, _line_, func);
         switch(va_arg(ptr, int)) {
             case MISSING_ARGUMENT:             
-                fprintf(stderr, " "White" %s:%d: "Red" error: "Grey" Missing argument for command. This command needs argument(error was in line: "Under" %d "Grey" in the \"test_asm\" file).\n\t| "Blue" \t%s "Grey" \n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White " %s:%d: " Red " error:" Grey " Missing argument for command. This command needs argument"
+                "(error was in line: " Under " %d " Grey " in the \"test_asm\" file).\n\t| " Blue " \t%s " Grey " \n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_ARGUMENT;
                 break;
             case INVALID_SYMBOLS:             
-                fprintf(stderr, " "White" %s:%d: "Red" error: "Grey" Invalid input. Invalid symbols(error was in line: "Under" %d "Grey" in the \"test_asm\" file).\n\t| "Blue" \t%s "Grey" \n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White " %s:%d: " Red " error:" Grey " Invalid input. Invalid symbols(error was in line:" Under " %d "
+                "" Grey " in the \"test_asm\" file).\n\t| " Blue " \t%s " Grey " \n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_SYMBOLS;
                 break;
             case INVALID_ARGUMENT:             
-                fprintf(stderr, " "White" %s:%d:"Red" error: "Grey" Invalid data. Argument of the command must be a number(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White  " %s:%d:" Red " error:" Grey " Invalid data. Argument of the command must be a number(error was in line:"
+                " " Under "%d" Grey " in the \"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_ARGUMENT;
                 break;
             case INVALID_DATA:             
-                fprintf(stderr, " "White" %s:%d:"Red" error: "Grey"Invalid data. Argument \"jmp\" must be like: \": 'number'\"(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White " %s:%d:" Red " error:" Grey "Invalid data. Argument \"jmp\" must be like: \": 'number'\"(error was in "
+                " line:" Under "%d" Grey " in the \"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_DATA;
                 break;
             case INVALID_COMMAND:             
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"Invalid input. Unknown command(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White  "%s:%d:" Red " error:" Grey "Invalid input. Unknown command(error was in line:" Under "%d" Grey " in the "
+                "\"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_COMMAND;
                 break;
             case INVALID_ARGUMENT_OF_LABEL0:
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"Invalid input, after 'L' must be ' '(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White  "%s:%d:" Red " error:" Grey "Invalid input, after 'L' must be ' '(error was in line:" Under "%d" Grey " "
+                "in the \"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_ARGUMENT_OF_LABEL0;
                 break;
             case INVALID_ARGUMENT_OF_LABEL1:
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"Invalid value of label. Valid values from 1 to 512(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White  "%s:%d:" Red " error:" Grey "Invalid value of label. Valid values from 1 to 512(error was in line:" Under " "
+                "%d" Grey " in the \"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_ARGUMENT_OF_LABEL1;
                 break;
             case INVALID_ARGUMENT_OF_LABEL2:
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"This label is already used. You can't use equal labels twice in one programm(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White  "%s:%d:" Red " error:" Grey "This label is already used. You can't use equal labels twice in one programm"
+                "(error was in line:" Under "%d" Grey " in the \"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_ARGUMENT_OF_LABEL2;
                 break;
             case INVALID_ARGUMENT_OF_LABEL3:
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"Invalid input: It must be label as number(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "Invalid input: It must be label as number(error was in line:" Under "%d" Grey " "
+                "in the \"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_ARGUMENT_OF_LABEL3;
                 break;
             case INVALID_TEXT1: 
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '\"' after 'db' as the start of the text(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n", __FILE__, _line_, line, string);
+                fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "must be '\"' after 'db' as the start of the text(error was in line:" Under "%d"
+                "" Grey " in the \"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n", __FILE__, _line_, line, string);
                 *count_errors += INVALID_TEXT1;
                 break;
             case INVALID_TEXT2: 
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '%c' in the end of the text before '\"'(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n",__FILE__, _line_, End_text_symb, line, string);
+                fprintf(stderr, "" White  "%s:%d:" Red " error:" Grey "must be '%c' in the end of the text before '\"'(error was in line:" Under "%d"
+                "" Grey " in the \"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n",__FILE__, _line_, End_text_symb, line, string);
                 *count_errors += INVALID_TEXT2;
                 break;
             case INVALID_TEXT3:
-                fprintf(stderr, ""White"%s:%d:"Red" error: "Grey"must be '\"' in the end of the text after '%c'(error was in line:"Under"%d"Grey" in the \"test_asm\" file).\n\t|"Blue"\t%s"Grey"\n\t|\n",__FILE__, _line_,  End_text_symb, line, string);
+                fprintf(stderr, "" White "%s:%d:" Red " error: " Grey "must be '\"' in the end of the text after '%c'(error was in line:" Under "%d"
+                "" Grey " in the \"test_asm\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n",__FILE__, _line_,  End_text_symb, line, string);
                 *count_errors += INVALID_TEXT3;
                 break;
             default: fprintf(stderr, "Chtoto ne tak\n");

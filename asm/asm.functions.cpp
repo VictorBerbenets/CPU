@@ -11,7 +11,7 @@ size_t getFileSize (const char *file) {
     struct stat buf = {};
     if (stat(file, &buf)) {
 
-        fprintf(stderr, "\n\033[0;31mERROR\033[0m!!!\nFile <%s>: in function <%s>,  in line '%d' - error in function \"stat\"\n\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        fprintf(stderr, "\n" Red "error" Grey "!!!\nFile <%s>: in function <%s>,  in line '%d' - error in function \"stat\"\n\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
         return ERROR_IN_READING_FILE;
     }
     return buf.st_size;
@@ -161,6 +161,8 @@ void CheckingForCorrectData (buffer* asm_commands, int* count_errors) {
     free(pts);
 }
 
+const int Data_size = 15;
+
 void ValidationOfInputData(char* string, int line, int* count_errors) {
 
     ASSERT(string != nullptr);
@@ -169,31 +171,32 @@ void ValidationOfInputData(char* string, int line, int* count_errors) {
         return ;
     }
 
-    char* pt      = string;
-    char data[15] = {};
-    int res       = 0;
+    char* current_token  = string; //current_lexema
+    char data[Data_size] = {};
+    int first_command    = 0;
     line++;
 
-    if ((res = Check_First_Command(&pt, data, line, string, count_errors)) == ERROR) {
+    if ((first_command = Check_First_Command(&current_token, data, line, string, count_errors)) == ERROR) {
         return ;
     }
-    switch (res) {
+    // #define Check_command(first_command)
+    switch (first_command) {
 
-        case asm_push:      Check_Push(&pt, line, string, count_errors);                                                  break;
-        case asm_pop:       Check_Pop_Reg(&pt, line, string, count_errors);                                               break;     
-        case asm_jmp:       Check_Jmp(&pt, line, string, count_errors);                                                   break;
-        case asm_jbe:       Check_Jmp(&pt, line, string, count_errors);                                                   break;
-        case asm_jae:       Check_Jmp(&pt, line, string, count_errors);                                                   break;
-        case asm_jne:       Check_Jmp(&pt, line, string, count_errors);                                                   break;
-        case asm_je:        Check_Jmp(&pt, line, string, count_errors);                                                   break;
-        case asm_ja:        Check_Jmp(&pt, line, string, count_errors);                                                   break;
-        case asm_jb:        Check_Jmp(&pt, line, string, count_errors);                                                   break;
-        case asm_call:      Check_call(&pt, line, string, count_errors);                                                  break;
-        case asm_out_text:  Check_call(&pt, line, string, count_errors);                                                  break;  
-        case asm_label:     Check_label(&pt, line, string, count_errors);                                                 break;
-        case asm_db:        Check_db   (&pt, line, string, count_errors);                                                 break;
-        case UNCORRECTDATA: PrintErrorForCommand(__FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_COMMAND); break;
-        default:            Check_Command_Without_Argument(&pt, line, string, count_errors);            
+        case asm_push:      Check_Push(&current_token, line, string, count_errors);                                                  break;
+        case asm_pop:       Check_Pop (&current_token, line, string, count_errors);                                                  break;     
+        case asm_jmp:       Check_Jmp(&current_token, line, string, count_errors);                                                   break;
+        case asm_jbe:       Check_Jmp(&current_token, line, string, count_errors);                                                   break;
+        case asm_jae:       Check_Jmp(&current_token, line, string, count_errors);                                                   break;
+        case asm_jne:       Check_Jmp(&current_token, line, string, count_errors);                                                   break;
+        case asm_je:        Check_Jmp(&current_token, line, string, count_errors);                                                   break;
+        case asm_ja:        Check_Jmp(&current_token, line, string, count_errors);                                                   break;
+        case asm_jb:        Check_Jmp(&current_token, line, string, count_errors);                                                   break;
+        case asm_call:      Check_call(&current_token, line, string, count_errors);                                                  break;
+        case asm_out_text:  Check_call(&current_token, line, string, count_errors);                                                  break;  
+        case asm_label:     Check_label(&current_token, line, string, count_errors);                                                 break;
+        case asm_db:        Check_db   (&current_token, line, string, count_errors);                                                 break;
+        case UNCORRECT_DATA:PrintErrorForCommand(__FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_COMMAND);            break;
+        default:            Check_Command_Without_Argument(&current_token, line, string, count_errors);            
     }
 }
 
@@ -212,53 +215,53 @@ int IsCorrectData(char* command) {
     #undef CMP
     #undef CMD
     
-    return UNCORRECTDATA;
+    return UNCORRECT_DATA;
 }
 
-void Constructor(buffer* asm_commands, char*** pts) {
+void Constructor(buffer* asm_commands, char*** pts) { //replase name
 
     ASSERT(asm_commands->buf != nullptr); 
     
     *pts = (char**) calloc(asm_commands->numbers_of_strings, sizeof(char*));
     ASSERT(*pts != nullptr); 
 
-    char* is_eof            = asm_commands->buf;
-    char* buf_pointer       = asm_commands->buf;
-    size_t buf_size         = asm_commands->buf_size;
-    size_t number_of_string = 0;
-    size_t symbols          = 0;
+    char* current_symbol_ptr = asm_commands->buf; //rename current_symbol_ptr
+    char* current_string     = asm_commands->buf; //rename current_string
+    size_t buf_size          = asm_commands->buf_size;
+    size_t number_of_string  = 0;
+    size_t symbols           = 0; //readed symb
     
-    for (size_t symbols_in_one_string = 0; symbols < buf_size; is_eof++, symbols ++) { 
+    for (size_t symbols_in_one_string = 0; symbols < buf_size; current_symbol_ptr++, symbols ++) { 
 
-        if (*is_eof != '\n' && *is_eof != '\0') {
+        if (*current_symbol_ptr != '\n' && *current_symbol_ptr != '\0') {
 
-            if (*is_eof == '#') { SkipComments(&is_eof, &symbols_in_one_string, &symbols, buf_size);}
+            if (*current_symbol_ptr == '#') { SkipComments(&current_symbol_ptr, &symbols_in_one_string, &symbols, buf_size);}
             else                { symbols_in_one_string++;             continue; }
         }   
 
-        if (*is_eof != '\n' && *is_eof != '\0') {
+        if (*current_symbol_ptr != '\n' && *current_symbol_ptr != '\0') {
 
             symbols_in_one_string++; continue;
         }   
 
-        *is_eof                    = '\0';
-        *(*pts + number_of_string) = buf_pointer;
+        *current_symbol_ptr                    = '\0';
+        *(*pts + number_of_string) = current_string;
         number_of_string++;
-        buf_pointer          += symbols_in_one_string + 1;   
+        current_string          += symbols_in_one_string + 1;   
         symbols_in_one_string = 0;
      
     }
 
-    *(is_eof) = '\0';
+    *(current_symbol_ptr) = '\0';
     asm_commands->numbers_of_strings = number_of_string;
 
 }
 
-void SkipComments(char** is_eof, size_t* symbols_in_one_string, size_t* symbols, size_t buf_size) {
+void SkipComments(char** current_symbol_ptr, size_t* symbols_in_one_string, size_t* symbols, size_t buf_size) {
 
-    while (**is_eof != '\n' && *symbols < buf_size) {
-        **is_eof = '\0';
-        (*is_eof)++;
+    while (**current_symbol_ptr != '\n' && *symbols < buf_size) {
+        **current_symbol_ptr = '\0';
+        (*current_symbol_ptr)++;
         (*symbols_in_one_string)++;
         (*symbols)++;
     }
@@ -279,7 +282,6 @@ void Destructor(buffer* asm_commands, token** tokens, char** test_bin_commands) 
     asm_commands->numbers_of_strings = 0;
 
     free(*test_bin_commands);
-
 }
 
 void Replacement(buffer* asm_commands) {
@@ -307,7 +309,7 @@ int GiveRegistor(char* command) {
     else if (!strcmp(command, "dx"))  return dx;
     else if (!strcmp(command, "ex"))  return ex;
     else if (!strcmp(command, "fx"))  return fx;
-    else     fprintf(stderr, "\033[0;31merror\033[0m: invalid register  \"%s\"\n", command);
+    else     fprintf(stderr, "" Red "error" Grey ": invalid register  \"%s\"\n", command);
     
     return ERROR;
 }
@@ -364,7 +366,12 @@ void MarkRegisterCommand( char** test_bin_commands, size_t* test_bin_number, siz
 
     (*test_bin_number)++;
     (*size) ++;
-    *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+
+    char* get_realloc_address = nullptr;
+    get_realloc_address = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+    ASSERT(get_realloc_address != nullptr);
+
+    *test_bin_commands = get_realloc_address;
 
     *(*test_bin_commands + *test_bin_number) = (char) reg;
 }
