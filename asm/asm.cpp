@@ -3,16 +3,22 @@
 const int Labels_size          = 512;  
 int Labels[Labels_size]        = {};
 
-int main() {
+int main(int argc, const char** argv) {
 
+    if (argc != 2) {
+        fprintf(stderr, "" Red "error:" Grey "Invalid input: you should enter the name of the file.\n");
+        return ERROR_IN_OPEN_FILE;
+    }
+    
     memset(Labels, -1, sizeof(int) * Labels_size);
 
     buffer asm_commands = {} ;
-    FillBuffer(&asm_commands);
+    const char* file_name = argv[argc - 1];
+    FillBuffer(&asm_commands, file_name);
 
     int count_errors = 0;
-    CheckingForCorrectData (&asm_commands, &count_errors);
-
+    CheckingForCorrectData (&asm_commands, &count_errors, file_name);
+    
     if (count_errors) { free(asm_commands.buf); return ERROR_IN_FILE; } //@ - End programm if error was find in file @//
 
 /////////////////////////////The_Main_Part/////////////////////////////////////////////////////////////////
@@ -57,7 +63,7 @@ int main() {
     ASSERT(test_bin_commands != nullptr, return MEMORY_ALLOCATION_ERROR);
 
     #undef CMD
-
+    
     FILE* replacement = fopen("test.bin", "wb");
     ASSERT(replacement != nullptr, return ERROR_IN_OPEN_FILE);
 

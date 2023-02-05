@@ -30,7 +30,13 @@ const int bite_for_register               = 1;
 
 const int Push_reg                        = 69;
 
+const int Push_number                     = 0;
+
+const int Push_or_Pop_ram                 = -1;
+
 const int Pop_reg                         = 0;
+
+
 
 struct buffer {
 
@@ -106,7 +112,7 @@ void FillToks(size_t* tokens_number, size_t number_of_commands, token** tokens, 
 
 void ReplacingArgumentsInJmp (token* toks, buffer* asm_commands, int* labels);
 
-void CheckingForCorrectData (buffer* asm_commands, int* count_errors) ;
+void CheckingForCorrectData (buffer* asm_commands, int* count_errors, const char* file_name) ;
 
 void Constructor (buffer* asm_commands, char*** pts);
 
@@ -114,13 +120,13 @@ void Destructor (buffer* asm_commands, token** toks, char** test_bin_commands);
 
 void Replacement (buffer* asm_commands);
 
-void ValidationOfInputData (char* string, int line, int* count_errors);
+void ValidationOfInputData (char* string, int line, int* count_errors, const char* file_name);
 
 int IsCorrectData(char* command);
 
 void GetNumbersOfStrings (buffer* asm_commands);
 
-void FillBuffer (buffer* asm_commands);
+void FillBuffer (buffer* asm_commands, const char* file_name);
 
 int Strlen(char* string);
 
@@ -132,25 +138,24 @@ int IsLabelCommand(const char* command);
 
 void SkipComments(char** current_symbol_ptr, size_t* symbols_in_one_string, size_t* symbols, size_t buf_size);
 
-void Check_Command_Without_Argument(char** pt, int line, char* string, int* count_errors);
+void Check_Command_Without_Argument(char** pt, int line, char* string, int* count_errors, const char* file_name);
 
-int Check_First_Command(char** pt, char* data, int line, char* string, int* count_errors);
+int Check_First_Command(char** pt, char* data, int line, char* string, int* count_errors, const char* file_name);
 
-void Check_Jmp(char** pt, int line, char* string, int* count_errors);
+void Check_Jmp(char** pt, int line, char* string, int* count_errors, const char* file_name);
 
-void Check_Push(char** pt, int line, char* string, int* count_errors);
+void Check_Push(char** pt, int line, char* string, int* count_errors, const char* file_name);
 
-void Check_Push_Register(char** pt, int line, char* string, int* count_errors );
-
-void Check_Pop(char** pt, int line, char* string, int* count_errors);
+void Check_Pop(char** pt, int line, char* string, int* count_errors, const char* file_name);
 
 void Print_Incorrect_Data(char* data, int line, char* string, int* count_errors);
 
-void Check_label(char** pt, int line, char* string, int* count_errors);
+void Check_label(char** pt, int line, char* string, int* count_errors, const char* file_name);
 
-void Check_call (char** pt, int line, char* string, int* count_errors);
+void Check_call (char** pt, int line, char* string, int* count_errors, const char* file_name);
 
-void PrintErrorForCommand(const char* func, int _line_, int line, char* string, int* count_errors, int numbers_of_errors, ...);
+void PrintErrorForCommand(const char* func, const char* file_name, int _line_, int line, char* string, int* count_errors,\
+int numbers_of_errors, ...);
 
 void MarkRegisterCommand(char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command);
 
@@ -158,7 +163,9 @@ void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, s
 
 void GetTextInArray (char** test_bin_commands, size_t* test_bin_number, char* text_string, size_t* size);
 
-void Check_db (char** pt, int line, char* string, int* count_errors);
+void Check_db (char** pt, int line, char* string, int* count_errors, const char* file_name);
+
+void Check_ram_command(char*** current_token);
 
 void SkipFirstSpacesInText(char** string);
 

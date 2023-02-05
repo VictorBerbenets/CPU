@@ -22,8 +22,7 @@ CMD(label)
 CMD(meow)
 CMD(sqrt)
 CMD(sum)
+CMD(video)
 CMD(out_text)
 CMD(text_begin)
 CMD(text_end)
-
-

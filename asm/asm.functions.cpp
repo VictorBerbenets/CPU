@@ -6,7 +6,7 @@ const char Text_command[]    = "db";
 
 size_t getFileSize (const char *file) { 
     
-    ASSERT(file != nullptr);
+    ASSERT(file != nullptr, exit(ERROR_IN_READING_FILE));
 
     struct stat buf = {};
     if (stat(file, &buf)) {
@@ -18,26 +18,26 @@ size_t getFileSize (const char *file) {
 }
 
 
-void FillBuffer (buffer* asm_commands) {
+void FillBuffer (buffer* asm_commands, const char* file_name) {
 
-    FILE* test_asm = fopen("test.asm", "r");
+    FILE* program_file = fopen(file_name, "r");
 
-    ASSERT(test_asm != nullptr);
+    ASSERT(program_file != nullptr, exit(ERROR_IN_OPEN_FILE));
 
-    asm_commands->buf_size = getFileSize("test.asm");
+    asm_commands->buf_size = getFileSize(file_name);
     asm_commands->buf = (char*) calloc(asm_commands->buf_size + 1, sizeof(char));
 
     ASSERT(asm_commands->buf != nullptr);
     
     size_t size_from_fread;
-    if ((size_from_fread = fread(asm_commands->buf, sizeof(char), asm_commands->buf_size, test_asm)) != (asm_commands->buf_size)) {
+    if ((size_from_fread = fread(asm_commands->buf, sizeof(char), asm_commands->buf_size, program_file)) != (asm_commands->buf_size)) {
 
-        ASSERT(!feof(test_asm));
+        ASSERT(!feof(program_file));
     }
 
     GetNumbersOfStrings (asm_commands);
 
-    char check_on_clossing_file = fclose(test_asm);
+    char check_on_clossing_file = fclose(program_file);
     ASSERT (check_on_clossing_file == 0);
 }
 
@@ -150,20 +150,20 @@ void GetNumbersOfStrings (buffer* asm_commands) {
     asm_commands->numbers_of_strings++; // последняя строка не посчиталась
 }
 
-void CheckingForCorrectData (buffer* asm_commands, int* count_errors) {
+void CheckingForCorrectData (buffer* asm_commands, int* count_errors, const char* file_name) {
 
     char** pts = nullptr;
     Constructor(asm_commands, &pts);
 
     for (size_t string_number = 0; string_number < asm_commands->numbers_of_strings; string_number++) { 
-        ValidationOfInputData(pts[string_number], string_number, count_errors);
+        ValidationOfInputData(pts[string_number], string_number, count_errors, file_name);
     }
     free(pts);
 }
 
 const int Data_size = 15;
 
-void ValidationOfInputData(char* string, int line, int* count_errors) {
+void ValidationOfInputData(char* string, int line, int* count_errors, const char* file_name) {
 
     ASSERT(string != nullptr);
 
@@ -176,27 +176,27 @@ void ValidationOfInputData(char* string, int line, int* count_errors) {
     int first_command    = 0;
     line++;
 
-    if ((first_command = Check_First_Command(&current_token, data, line, string, count_errors)) == ERROR) {
+    if ((first_command = Check_First_Command(&current_token, data, line, string, count_errors, file_name)) == ERROR) {
         return ;
     }
     // #define Check_command(first_command)
     switch (first_command) {
 
-        case asm_push:      Check_Push(&current_token, line, string, count_errors);                                                  break;
-        case asm_pop:       Check_Pop (&current_token, line, string, count_errors);                                                  break;     
-        case asm_jmp:       Check_Jmp(&current_token, line, string, count_errors);                                                   break;
-        case asm_jbe:       Check_Jmp(&current_token, line, string, count_errors);                                                   break;
-        case asm_jae:       Check_Jmp(&current_token, line, string, count_errors);                                                   break;
-        case asm_jne:       Check_Jmp(&current_token, line, string, count_errors);                                                   break;
-        case asm_je:        Check_Jmp(&current_token, line, string, count_errors);                                                   break;
-        case asm_ja:        Check_Jmp(&current_token, line, string, count_errors);                                                   break;
-        case asm_jb:        Check_Jmp(&current_token, line, string, count_errors);                                                   break;
-        case asm_call:      Check_call(&current_token, line, string, count_errors);                                                  break;
-        case asm_out_text:  Check_call(&current_token, line, string, count_errors);                                                  break;  
-        case asm_label:     Check_label(&current_token, line, string, count_errors);                                                 break;
-        case asm_db:        Check_db   (&current_token, line, string, count_errors);                                                 break;
-        case UNCORRECT_DATA:PrintErrorForCommand(__FUNCTION__, __LINE__, line, string, count_errors, 1, INVALID_COMMAND);            break;
-        default:            Check_Command_Without_Argument(&current_token, line, string, count_errors);            
+        case asm_push:      Check_Push(&current_token, line, string, count_errors, file_name);                              break;
+        case asm_pop:       Check_Pop (&current_token, line, string, count_errors, file_name);                              break;     
+        case asm_jmp:       Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_jbe:       Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_jae:       Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_jne:       Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_je:        Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_ja:        Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_jb:        Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_call:      Check_call(&current_token, line, string, count_errors, file_name);                              break;
+        case asm_out_text:  Check_call(&current_token, line, string, count_errors, file_name);                              break;  
+        case asm_label:     Check_label(&current_token, line, string, count_errors, file_name);                             break;
+        case asm_db:        Check_db   (&current_token, line, string, count_errors, file_name);                             break;
+        case UNCORRECT_DATA:PrintErrorForCommand(__FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_COMMAND);   break;
+        default:            Check_Command_Without_Argument(&current_token, line, string, count_errors, file_name);            
     }
 }
 
@@ -363,30 +363,42 @@ void MarkRegisterCommand( char** test_bin_commands, size_t* test_bin_number, siz
 
     int reg = GiveRegistor(command);
     *(*test_bin_commands + *test_bin_number) = (char) Push_reg;
-
+    
     (*test_bin_number)++;
     (*size) ++;
 
-    char* get_realloc_address = nullptr;
-    get_realloc_address = (char*) realloc(*test_bin_commands, *size * sizeof(char));
-    ASSERT(get_realloc_address != nullptr);
-
-    *test_bin_commands = get_realloc_address;
+    *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
 
     *(*test_bin_commands + *test_bin_number) = (char) reg;
 }
 
 void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command) {
 
-    if (*((*test_bin_commands) + *test_bin_number - 1) == asm_push) {
+    char* command_ptr = *test_bin_commands + *test_bin_number - 1;
+    if (*test_bin_number >= 1 && (*command_ptr == asm_push || *command_ptr == asm_pop)) {
 
-        *(*test_bin_commands + *test_bin_number) = 0;
-        (*test_bin_number) ++;
-        *size              += sizeof(Data) + 1;
-        *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+        if (strchr(command, '[')) { // ram command
 
-        *(Data*)(*test_bin_commands + *test_bin_number) = atof(command);
-        (*test_bin_number) += sizeof(Data) - 1;
+            command++;
+            *(*test_bin_commands + *test_bin_number) = Push_or_Pop_ram;
+
+            *size              += sizeof(int) + 1;
+            *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+
+            (*test_bin_number) ++;
+            *(int*)(*test_bin_commands + *test_bin_number) = atoi(command);
+            (*test_bin_number) += sizeof(int) - 1;
+        }
+        else if (*command_ptr == asm_push) {
+            *(*test_bin_commands + *test_bin_number) = Push_number;
+
+            *size              += sizeof(Data) + 1;
+            *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+
+            (*test_bin_number) ++;
+            *(Data*)(*test_bin_commands + *test_bin_number) = atof(command);
+            (*test_bin_number) += sizeof(Data) - 1;
+        }
 
     }
     else {
