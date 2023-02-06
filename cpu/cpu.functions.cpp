@@ -1,5 +1,6 @@
 #include "CPU.h"
 
+
 long getFileSize(const char *file) {
     
     assert(file != NULL);
@@ -8,18 +9,21 @@ long getFileSize(const char *file) {
 
     if (stat(file, &buf)) {
 
-        fprintf(stderr, "\033[0;31mERROR\033[0m!!!\nFile <%s>: in function <%s>,  in line '%d' - error in function \"stat\"\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        fprintf(stderr, "" Red "error" Grey "!!!\nFile <%s>: in function <%s>,  in line '%d' - error in function \"stat\"\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
         return -1;
     }
 
     return buf.st_size;
 }
 
+
+const int Max_text_size = 100;
+
 void in(stack* stack_cpu, int* number) {
     
     Data push_value = 0;
     char ch = 0;
-    char arr[100];
+    char arr[Max_text_size];
 
     if (scanf("%lg", &push_value) && ((ch = getchar()) == '\n' || ch == ' ')) {
         StackPush(stack_cpu, push_value);
@@ -27,13 +31,16 @@ void in(stack* stack_cpu, int* number) {
     else {
         arr[0] = ch;
         int number_of_char = (ch == 0) ? 0:1;
-        for ( ; (ch = getchar()) != '\n'; number_of_char++) {
+        for ( ; (ch = getchar()) != '\n' && number_of_char < Max_text_size; number_of_char++) {
+
             arr[number_of_char] = ch;
         }
         arr[number_of_char] = '\0';
 
         printf("\n*********************************************************************\n");
-        printf("\033[0;31mERROR\033[0m!!!\n\"%s\" - invalid symbols\n", arr);
+        if (number_of_char == Max_text_size) { printf("Input size is too long. It must be < '%d' symbols\n", Max_text_size); }
+        
+        printf("" Red "error!!!" Grey "\n%s\" - invalid symbols\n", arr);
         printf("Please try again!\n");
         printf("***********************************************************************\n");
         
@@ -41,19 +48,23 @@ void in(stack* stack_cpu, int* number) {
     }
 }
 
+// DSL.h - definding special language (какие команды повторяется задефайнить)
 void push(CPU* my_cpu, int* number) {
 
     (*number)++;
 
     if (my_cpu->data[*number] == Push_reg) {
-
         (*number)++;
-        StackPush(&my_cpu->stack_cpu, my_cpu->cpu_registers[(int)my_cpu->data[*number]]);
+        Push_register()
+    }
+    else if (my_cpu->data[*number] == Push_or_Pop_ram) {
+        (*number)++;
+        StackPush(&my_cpu->stack_cpu, my_cpu->ram[(int)my_cpu->data[*number]]);
+        (*number) += sizeof(int) - 1;
     }
     else {
-
         (*number)++;
-        StackPush(&my_cpu->stack_cpu, *(Data*)(my_cpu->data + *number));
+        Push_number();
         (*number) += sizeof(Data) - 1;
     }
 
@@ -66,6 +77,11 @@ void pop(CPU* my_cpu, int* number) {
 
         (*number)++;
         my_cpu->cpu_registers[(int) my_cpu->data[*number]] = StackPop(&my_cpu->stack_cpu);
+    }
+    else if (my_cpu->data[*number] == Push_or_Pop_ram) {
+        (*number)++;
+        my_cpu->ram[(int) my_cpu->data[*number]] = StackPop(&my_cpu->stack_cpu);
+        (*number) += sizeof(int) - 1;
     }
     else {
 
@@ -85,6 +101,30 @@ void jmp(CPU* my_cpu, int* number) {
     (*number)++;
     *number = *((int*)(my_cpu->data + *number)) - 1;
 }
+
+#define f 
+
+void jmp(CPU* my_cpu, int* number, int comm_numb) {
+
+    (*number)++;
+
+    if (comm_numb == cpu_jmp) { 
+        *number = *((int*)(my_cpu->data + *number)) - 1;
+    }
+    else {
+        Data stack_value1 = StackPop(&my_cpu->stack_cpu);
+        Data stack_value2 = StackPop(&my_cpu->stack_cpu);
+
+        if (stack_value1 >= stack_value2) {
+
+            *number = *((int*)(my_cpu->data + *number)) - 1;
+        }
+        else {
+            (*number) += sizeof(int) - 1;
+        }
+    }
+}
+
 
 void jae(CPU* my_cpu, int* number) {
 
@@ -134,7 +174,7 @@ void jbe(CPU* my_cpu, int* number) {
 }
 
 void jb(CPU* my_cpu, int* number) {
-
+//JMP(<=)
     (*number)++;
     Data stack_value1 = StackPop(&my_cpu->stack_cpu);
     Data stack_value2 = StackPop(&my_cpu->stack_cpu);
@@ -200,7 +240,7 @@ void add(stack* st) {
     }
     else {
 
-        printf("Size of stack < 2, we can't get two numbers to plus them\n");
+        fprintf(stderr, "Size of stack < 2, we can't get two numbers to plus them\n");
     }
 }
 
@@ -335,6 +375,28 @@ void db (CPU* my_cpu, int* number) {
 
         (*number)++;
     }
+}
+
+const int video_size = 32;
+
+void video(CPU* my_cpu) {
+
+    printf("\n\t\t\t" Blinking "RAM_DUMP" Grey "\n");
+    printf("" Blue "------------------------------------------------------------------\n|" Grey "");
+    for (int ram_number = 0; ram_number < Ram_size; ram_number++) {
+      //  floor(log10(90));
+        if (my_cpu -> ram[ram_number] != 0) {
+            printf("" Red "* " Grey "");
+        } 
+        else {
+            printf(". ");
+        }
+        if ((ram_number + 1) % video_size == 0) {
+            printf("" Blue "|\n|" Grey "");
+        }
+    }
+    printf("" Blue "----------------------------------------------------------------|\n\n" Grey "");
+
 }
 
 void Destructor(CPU* my_cpu) {

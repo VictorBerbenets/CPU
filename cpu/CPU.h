@@ -1,9 +1,10 @@
 #ifndef CPU_PROGRAMM
 #define CPU_PROGRAMM
 
-#include "stack.h"
-#include "..//asm//my_assert.h"
 #include "..//asm//colors.h"
+#include "..//asm//my_assert.h"
+#include "stack.h"
+#include "DSL.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -16,23 +17,25 @@
 
 const int Stop_programm = -1;
 
-const int Push_reg = 69;
-const int Pop_reg  = 69;
+const int Push_reg         = 69;
+const int Pop_reg          = 69;
+const int Push_or_Pop_ram  = -1;
 
-const int Ram_size       = 256;
+
+const int Ram_size       = 1024;
 const int Registers_size = 7;
 
 const Data Epsilon       = 1e-17;
 
 struct CPU { 
 
-    stack stack_cpu   ;
-    size_t data_size  ;
-    Data Ram[Ram_size];
+    stack stack_cpu;
+    size_t data_size;
     Data cpu_registers[Registers_size];
-    char*  data       ;    
+    char*  data;    
+    int ram_elements;
+    Data ram[Ram_size] = {};
 } ;
-
 
 enum CPU_errors {
 
@@ -43,7 +46,7 @@ enum CPU_errors {
     ERROR_IN_CLOSSING_FILE = 0xDED2 ,
 };
 
-#define CMD(cmd) cpu_##cmd,
+#define CMD(cmd, ...) cpu_##cmd,
 
 enum Commands{
 
@@ -104,6 +107,8 @@ int is_equal(Data number1, Data number2);
 void db (CPU* cpu, int* number);
 
 void Destructor(CPU* my_cpu);
+
+void video(CPU* cpu);
 
 void meow();
 

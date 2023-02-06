@@ -30,7 +30,7 @@
 # .PHONY: clean
 CC = g++
 
-CFLAGS =-c -Wall -Wextra 
+CFLAGS = -c -Wall -Wextra 
 
 all : CPU
 
@@ -48,3 +48,5 @@ Functions.stack.o: Functions.stack.cpp
 
 clean:
 	rm -rf *.o CPU
+
+rebuild: clean all
