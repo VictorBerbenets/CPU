@@ -26,6 +26,8 @@ const char separates_symbols[]            = " '\n''\t'':'";
 
 const char skip_simbols[]                 = " '\t'':'";
 
+const int Ram_size                        = 1024;
+
 const int bite_for_register               = 1;
 
 const int Push_reg                        = 69;
@@ -79,9 +81,11 @@ enum ASM_errors {
     INVALID_ARGUMENT_OF_LABEL3 = (1 << 8),
     ERROR_IN_FILE              = -0xFAAACE1,
     CORRECTDATA                =  0xDEDFEED1,
+    INVALID_RAM                =  0xFEED2,
+    INVALID_RAM_VALUE          =  0xFEED5,
     INVALID_TEXT1              =  0xDED1,
     INVALID_TEXT2              =  0xDED2,
-    INVALID_TEXT3              =  0xDED3,
+    INVALID_TEXT3              =  0xDED3,              
     UNCORRECT_DATA             =  0XDED02,
     ERROR_IN_FWRITE            =  0XDED03,
     ERROR_IN_OPEN_FILE         =  0XDED04,
@@ -93,7 +97,7 @@ enum ASM_errors {
 
 enum Commands{
 
-#define CMD(cmd) asm_##cmd,
+#define CMD(cmd, ...) asm_##cmd,
 
 #include "cmds.h"
 
@@ -118,23 +122,9 @@ void Constructor (buffer* asm_commands, char*** pts);
 
 void Destructor (buffer* asm_commands, token** toks, char** test_bin_commands);
 
-void Replacement (buffer* asm_commands);
-
 void ValidationOfInputData (char* string, int line, int* count_errors, const char* file_name);
 
-int IsCorrectData(char* command);
-
-void GetNumbersOfStrings (buffer* asm_commands);
-
 void FillBuffer (buffer* asm_commands, const char* file_name);
-
-int Strlen(char* string);
-
-int GiveRegistor(char* command);
-
-int Is_Label(char* string);
-
-int IsLabelCommand(const char* command);
 
 void SkipComments(char** current_symbol_ptr, size_t* symbols_in_one_string, size_t* symbols, size_t buf_size);
 
@@ -142,11 +132,11 @@ void Check_Command_Without_Argument(char** pt, int line, char* string, int* coun
 
 int Check_First_Command(char** pt, char* data, int line, char* string, int* count_errors, const char* file_name);
 
-void Check_Jmp(char** pt, int line, char* string, int* count_errors, const char* file_name);
+void Check_jmp(char** pt, int line, char* string, int* count_errors, const char* file_name);
 
-void Check_Push(char** pt, int line, char* string, int* count_errors, const char* file_name);
+void Check_push(char** pt, int line, char* string, int* count_errors, const char* file_name);
 
-void Check_Pop(char** pt, int line, char* string, int* count_errors, const char* file_name);
+void Check_pop(char** pt, int line, char* string, int* count_errors, const char* file_name);
 
 void Print_Incorrect_Data(char* data, int line, char* string, int* count_errors);
 
@@ -163,13 +153,27 @@ void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, s
 
 void GetTextInArray (char** test_bin_commands, size_t* test_bin_number, char* text_string, size_t* size);
 
+void Check_ram_command(char*** current_token, int line, char* string, int* count_errors, const char* file_name);
+
 void Check_db (char** pt, int line, char* string, int* count_errors, const char* file_name);
 
-void Check_ram_command(char*** current_token);
+void GetNumbersOfStrings (buffer* asm_commands);
 
 void SkipFirstSpacesInText(char** string);
 
+int IsLabelCommand(const char* command);
+
+void Replacement (buffer* asm_commands);
+
+int IsCorrectData(char* command);
+
 void SkipSpaces(char*** pointer);
+
+int GiveRegistor(char* command);
+
+int Is_Label(char* string);
+
+int Strlen(char* string);
 
 void foo(int line);
 

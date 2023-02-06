@@ -179,26 +179,29 @@ void ValidationOfInputData(char* string, int line, int* count_errors, const char
     if ((first_command = Check_First_Command(&current_token, data, line, string, count_errors, file_name)) == ERROR) {
         return ;
     }
-    // #define Check_command(first_command)
+
+    // #define CMD(command) case asm_##command: Check_##command(&current_token, line, string, count_errors, file_name); break;
+    // if (first_command >= asm_jb && first_command <= asm_jne) { first_command == asm_jmp; }
+
     switch (first_command) {
 
-        case asm_push:      Check_Push(&current_token, line, string, count_errors, file_name);                              break;
-        case asm_pop:       Check_Pop (&current_token, line, string, count_errors, file_name);                              break;     
-        case asm_jmp:       Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_jbe:       Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_jae:       Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_jne:       Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_je:        Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_ja:        Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_jb:        Check_Jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_push:      Check_push(&current_token, line, string, count_errors, file_name);                              break;
+        case asm_pop:       Check_pop (&current_token, line, string, count_errors, file_name);                              break;     
+        case asm_jmp:       Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_jbe:       Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_jae:       Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_jne:       Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_je:        Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_ja:        Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
+        case asm_jb:        Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
         case asm_call:      Check_call(&current_token, line, string, count_errors, file_name);                              break;
-        case asm_out_text:  Check_call(&current_token, line, string, count_errors, file_name);                              break;  
         case asm_label:     Check_label(&current_token, line, string, count_errors, file_name);                             break;
         case asm_db:        Check_db   (&current_token, line, string, count_errors, file_name);                             break;
-        case UNCORRECT_DATA:PrintErrorForCommand(__FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_COMMAND);   break;
-        default:            Check_Command_Without_Argument(&current_token, line, string, count_errors, file_name);            
+        case UNCORRECT_DATA: PrintErrorForCommand(__FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_COMMAND); break;
+        default:             Check_Command_Without_Argument(&current_token, line, string, count_errors, file_name);            
     }
 }
+
 
 int IsCorrectData(char* command) {
 
@@ -206,7 +209,7 @@ int IsCorrectData(char* command) {
 
     #define CMP(cmd) (!strcmp(#cmd, command))
 
-    #define CMD(cmd_name) if(CMP(cmd_name)) {   \
+    #define CMD(cmd_name, ...) if(CMP(cmd_name)) {   \
                       return  asm_##cmd_name;   \
                       } else                    \
 

@@ -4,7 +4,7 @@
 char End_text_symb      = '^';
 
 
-void Check_Push(char** current_token, int line, char* string, int* count_errors, const char* file_name) {
+void Check_push(char** current_token, int line, char* string, int* count_errors, const char* file_name) {
 
     Data argument  = 0;
     int value     = 0;
@@ -14,7 +14,7 @@ void Check_Push(char** current_token, int line, char* string, int* count_errors,
 
     if (**current_token == '[') {
 
-        Check_ram_command(&current_token);
+        Check_ram_command(&current_token, line, string, count_errors, file_name);
         return ;
     }
 
@@ -64,34 +64,38 @@ void Check_Push(char** current_token, int line, char* string, int* count_errors,
     }
 }
 
-void Check_ram_command(char*** current_token) {
+void Check_ram_command(char*** current_token, int line, char* string, int* count_errors, const char* file_name) {
 
     int command_data = 0;
     int readed_symbs = 0;
     (**current_token)++;
     if (sscanf(**current_token, "%d%n", &command_data, &readed_symbs)) {
+
         (**current_token) += readed_symbs;
+        if (command_data >= Ram_size || command_data < 0) {
+            PrintErrorForCommand(__PRETTY_FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_RAM_VALUE); 
+        }
         if (***current_token != ']') {
-            printf("err\n");
+            PrintErrorForCommand(__PRETTY_FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_RAM); 
         }
         else if (Strlen(**current_token) != 1) {
-            printf("err\n");
+            PrintErrorForCommand(__PRETTY_FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_RAM); 
         }
         }
         else {
-            printf( "err\n");
+            PrintErrorForCommand(__PRETTY_FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_RAM); 
         }
 }
 
 
 // check_pop 
-void Check_Pop(char** current_token, int line, char* string, int* count_errors, const char* file_name) {
+void Check_pop(char** current_token, int line, char* string, int* count_errors, const char* file_name) {
 
     SkipSpaces(&current_token);
 
     if (**current_token == '[') {
 
-        Check_ram_command(&current_token);
+        Check_ram_command(&current_token, line, string, count_errors, file_name);
         return ;
     }
 
@@ -124,7 +128,7 @@ void Check_Pop(char** current_token, int line, char* string, int* count_errors, 
 }
 
     
-void Check_Jmp(char** current_token, int line, char* string, int* count_errors, const char* file_name) {
+void Check_jmp(char** current_token, int line, char* string, int* count_errors, const char* file_name) {
 
     int value    = 0;
     int argument = 0;
@@ -344,7 +348,7 @@ int Is_Label(char* string) {
 
     for (int current_number = 0; current_number < numbers_of_errors; current_number++) {
 
-        fprintf(stderr, "" White " %s:%d: " Grey " In function" White " '%s': " Grey " \n", __FILE__, _line_, func);
+        fprintf(stderr, "" White "%s:%d:" Grey "In function" White " '%s': " Grey " \n", __FILE__, _line_, func);
         switch(va_arg(ptr, int)) {
             case MISSING_ARGUMENT:             
                 fprintf(stderr, "" White " %s:%d: " Red " error:" Grey " Missing argument for command. This command needs argument"
@@ -404,6 +408,16 @@ int Is_Label(char* string) {
             case INVALID_TEXT3:
                 fprintf(stderr, "" White "%s:%d:" Red " error: " Grey "must be '\"' in the end of the text after '%c'(error was in line:" Under "%d"
                 "" Grey " in the \"%s\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n",__FILE__, _line_,  End_text_symb, line, file_name, string);
+                *count_errors += INVALID_TEXT3;
+                break;
+            case INVALID_RAM:
+                fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "Invalid ram argument. Its must be like '[int]'(error was in line:" Under "%d"
+                "" Grey " in the \"%s\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n",__FILE__, _line_, line, file_name, string);
+                *count_errors += INVALID_TEXT3;
+                break;
+            case INVALID_RAM_VALUE:
+                fprintf(stderr, "" White "%s:%d:" Red " error: " Grey "Invalid ram value. Its must be in range[0, 1023](error was in line:" Under "%d"
+                "" Grey " in the \"%s\" file).\n\t|" Blue "\t%s" Grey "\n\t|\n",__FILE__, _line_, line, file_name, string);
                 *count_errors += INVALID_TEXT3;
                 break;
             default: fprintf(stderr, "Chtoto ne tak\n");
