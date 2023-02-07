@@ -153,7 +153,7 @@ void GetNumbersOfStrings (buffer* asm_commands) {
 void CheckingForCorrectData (buffer* asm_commands, int* count_errors, const char* file_name) {
 
     char** pts = nullptr;
-    Constructor(asm_commands, &pts);
+    StringsDeveloper(asm_commands, &pts);
 
     for (size_t string_number = 0; string_number < asm_commands->numbers_of_strings; string_number++) { 
         ValidationOfInputData(pts[string_number], string_number, count_errors, file_name);
@@ -171,7 +171,7 @@ void ValidationOfInputData(char* string, int line, int* count_errors, const char
         return ;
     }
 
-    char* current_token  = string; //current_lexema
+    char* current_token  = string; 
     char data[Data_size] = {};
     int first_command    = 0;
     line++;
@@ -180,24 +180,21 @@ void ValidationOfInputData(char* string, int line, int* count_errors, const char
         return ;
     }
 
-    // #define CMD(command) case asm_##command: Check_##command(&current_token, line, string, count_errors, file_name); break;
-    // if (first_command >= asm_jb && first_command <= asm_jne) { first_command == asm_jmp; }
-
     switch (first_command) {
 
-        case asm_push:      Check_push(&current_token, line, string, count_errors, file_name);                              break;
-        case asm_pop:       Check_pop (&current_token, line, string, count_errors, file_name);                              break;     
-        case asm_jmp:       Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_jbe:       Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_jae:       Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_jne:       Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_je:        Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_ja:        Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_jb:        Check_jmp(&current_token, line, string, count_errors, file_name);                               break;
-        case asm_call:      Check_call(&current_token, line, string, count_errors, file_name);                              break;
-        case asm_label:     Check_label(&current_token, line, string, count_errors, file_name);                             break;
-        case asm_db:        Check_db   (&current_token, line, string, count_errors, file_name);                             break;
-        case UNCORRECT_DATA: PrintErrorForCommand(__FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_COMMAND); break;
+        case asm_push:       Check_push(&current_token, line, string, count_errors, file_name);                                        break;
+        case asm_pop:        Check_pop (&current_token, line, string, count_errors, file_name);                                        break;     
+        case asm_jmp:        Check_jmp(&current_token, line, string, count_errors, file_name);                                         break;
+        case asm_jbe:        Check_jmp(&current_token, line, string, count_errors, file_name);                                         break;
+        case asm_jae:        Check_jmp(&current_token, line, string, count_errors, file_name);                                         break;
+        case asm_jne:        Check_jmp(&current_token, line, string, count_errors, file_name);                                         break;
+        case asm_je:         Check_jmp(&current_token, line, string, count_errors, file_name);                                         break;
+        case asm_ja:         Check_jmp(&current_token, line, string, count_errors, file_name);                                         break;
+        case asm_jb:         Check_jmp(&current_token, line, string, count_errors, file_name);                                         break;
+        case asm_call:       Check_call(&current_token, line, string, count_errors, file_name);                                        break;
+        case asm_label:      Check_label(&current_token, line, string, count_errors, file_name);                                       break;
+        case asm_db:         Check_db   (&current_token, line, string, count_errors, file_name);                                       break;
+        case UNCORRECT_DATA: PrintErrorForCommand(__FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_COMMAND);  break;
         default:             Check_Command_Without_Argument(&current_token, line, string, count_errors, file_name);            
     }
 }
@@ -221,18 +218,18 @@ int IsCorrectData(char* command) {
     return UNCORRECT_DATA;
 }
 
-void Constructor(buffer* asm_commands, char*** pts) { //replase name
+void StringsDeveloper(buffer* asm_commands, char*** pts) { 
 
     ASSERT(asm_commands->buf != nullptr); 
     
     *pts = (char**) calloc(asm_commands->numbers_of_strings, sizeof(char*));
     ASSERT(*pts != nullptr); 
 
-    char* current_symbol_ptr = asm_commands->buf; //rename current_symbol_ptr
-    char* current_string     = asm_commands->buf; //rename current_string
+    char* current_symbol_ptr = asm_commands->buf; 
+    char* current_string     = asm_commands->buf; 
     size_t buf_size          = asm_commands->buf_size;
     size_t number_of_string  = 0;
-    size_t symbols           = 0; //readed symb
+    size_t symbols           = 0; 
     
     for (size_t symbols_in_one_string = 0; symbols < buf_size; current_symbol_ptr++, symbols ++) { 
 
@@ -405,7 +402,6 @@ void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, s
 
     }
     else {
-
         *size             += sizeof(int) + 1;
         *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
 

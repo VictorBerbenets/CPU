@@ -118,7 +118,7 @@ void ReplacingArgumentsInJmp (token* toks, buffer* asm_commands, int* labels);
 
 void CheckingForCorrectData (buffer* asm_commands, int* count_errors, const char* file_name) ;
 
-void Constructor (buffer* asm_commands, char*** pts);
+void StringsDeveloper (buffer* asm_commands, char*** pts);
 
 void Destructor (buffer* asm_commands, token** toks, char** test_bin_commands);
 
