@@ -79,8 +79,9 @@ void pop(CPU* my_cpu, int* number) {
         my_cpu->cpu_registers[(int) my_cpu->data[*number]] = StackPop(&my_cpu->stack_cpu);
     }
     else if (my_cpu->data[*number] == Push_or_Pop_ram) {
+        
         (*number)++;
-        my_cpu->ram[(int) my_cpu->data[*number]] = StackPop(&my_cpu->stack_cpu);
+        my_cpu->ram [*(int*)(my_cpu->data + *number)] = StackPop(&my_cpu->stack_cpu);
         (*number) += sizeof(int) - 1;
     }
     else {
@@ -384,7 +385,7 @@ void video(CPU* my_cpu) {
     printf("\n\t\t\t" Blinking "RAM_DUMP" Grey "\n");
     printf("" Blue "------------------------------------------------------------------\n|" Grey "");
     for (int ram_number = 0; ram_number < Ram_size; ram_number++) {
-      //  floor(log10(90));
+
         if (my_cpu -> ram[ram_number] != 0) {
             printf("" Red "* " Grey "");
         } 
