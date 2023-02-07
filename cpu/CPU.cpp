@@ -29,7 +29,8 @@ int main(){
     for (int number = 0 ; number < (int)my_cpu.data_size && number != Stop_programm; number++){
 
         _StackCheck(&my_cpu.stack_cpu);
-        switch ((int)my_cpu.data[number]) {              
+        switch ((int)my_cpu.data[number]) {    
+                      
             #include "..//asm//cmds.h"
             default: error(&my_cpu, number);
         }

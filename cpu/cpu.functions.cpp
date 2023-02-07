@@ -55,11 +55,11 @@ void push(CPU* my_cpu, int* number) {
 
     if (my_cpu->data[*number] == Push_reg) {
         (*number)++;
-        Push_register()
+        Push_register();
     }
     else if (my_cpu->data[*number] == Push_or_Pop_ram) {
         (*number)++;
-        StackPush(&my_cpu->stack_cpu, my_cpu->ram[(int)my_cpu->data[*number]]);
+        Push_ram_number();
         (*number) += sizeof(int) - 1;
     }
     else {
@@ -76,18 +76,18 @@ void pop(CPU* my_cpu, int* number) {
     if (my_cpu->data[*number] == Pop_reg) { 
 
         (*number)++;
-        my_cpu->cpu_registers[(int) my_cpu->data[*number]] = StackPop(&my_cpu->stack_cpu);
+        Pop_to_register();
     }
     else if (my_cpu->data[*number] == Push_or_Pop_ram) {
-        
+
         (*number)++;
-        my_cpu->ram [*(int*)(my_cpu->data + *number)] = StackPop(&my_cpu->stack_cpu);
+        Pop_to_ram();
         (*number) += sizeof(int) - 1;
     }
     else {
 
         (*number)++;
-        StackPop(&my_cpu->stack_cpu);
+        Pop();
     }
 
 }
@@ -100,42 +100,19 @@ void sqrt(stack* stack_cpu) {
 void jmp(CPU* my_cpu, int* number) {
 
     (*number)++;
-    *number = *((int*)(my_cpu->data + *number)) - 1;
-}
-
-#define f 
-
-void jmp(CPU* my_cpu, int* number, int comm_numb) {
-
-    (*number)++;
-
-    if (comm_numb == cpu_jmp) { 
-        *number = *((int*)(my_cpu->data + *number)) - 1;
-    }
-    else {
-        Data stack_value1 = StackPop(&my_cpu->stack_cpu);
-        Data stack_value2 = StackPop(&my_cpu->stack_cpu);
-
-        if (stack_value1 >= stack_value2) {
-
-            *number = *((int*)(my_cpu->data + *number)) - 1;
-        }
-        else {
-            (*number) += sizeof(int) - 1;
-        }
-    }
+    *number = Jmp_command_address();
 }
 
 
 void jae(CPU* my_cpu, int* number) {
 
     (*number)++;
-    Data stack_value1 = StackPop(&my_cpu->stack_cpu);
-    Data stack_value2 = StackPop(&my_cpu->stack_cpu);
+    Stack_pop_value1();
+    Stack_pop_value2();
 
     if (stack_value1 >= stack_value2) {
 
-        *number = *((int*)(my_cpu->data + *number)) - 1;
+        *number = Jmp_command_address();
     }
     else {
         (*number) += sizeof(int) - 1;
@@ -145,12 +122,12 @@ void jae(CPU* my_cpu, int* number) {
 void ja(CPU* my_cpu, int* number) {
 
     (*number)++;
-    Data stack_value1 = StackPop(&my_cpu->stack_cpu);
-    Data stack_value2 = StackPop(&my_cpu->stack_cpu);
+    Stack_pop_value1();
+    Stack_pop_value2();
 
     if (stack_value1 > stack_value2) {
 
-        *number = *((int*)(my_cpu->data + *number)) - 1;
+        *number = Jmp_command_address();
     }
     else {
         (*number) += sizeof(int) - 1;
@@ -161,12 +138,12 @@ void ja(CPU* my_cpu, int* number) {
 void jbe(CPU* my_cpu, int* number) {
 
     (*number)++;
-    Data stack_value1 = StackPop(&my_cpu->stack_cpu);
-    Data stack_value2 = StackPop(&my_cpu->stack_cpu);
+    Stack_pop_value1();
+    Stack_pop_value2();
 
     if (stack_value1 <= stack_value2) {
 
-        *number = *((int*)(my_cpu->data + *number)) - 1;
+        *number = Jmp_command_address();
     }
     else {
         (*number) += sizeof(int) - 1;
@@ -175,13 +152,14 @@ void jbe(CPU* my_cpu, int* number) {
 }
 
 void jb(CPU* my_cpu, int* number) {
-//JMP(<=)
+
     (*number)++;
-    Data stack_value1 = StackPop(&my_cpu->stack_cpu);
-    Data stack_value2 = StackPop(&my_cpu->stack_cpu);
+    Stack_pop_value1();
+    Stack_pop_value2();
+
     if (stack_value1 < stack_value2) {
 
-        *number = *((int*)(my_cpu->data + *number)) - 1;
+        *number = Jmp_command_address();
     }
     else {
         (*number) += sizeof(int) - 1;
@@ -191,12 +169,12 @@ void jb(CPU* my_cpu, int* number) {
 void jne(CPU* my_cpu, int* number) {
 
     (*number)++;
-    Data stack_value1 = StackPop(&my_cpu->stack_cpu);
-    Data stack_value2 = StackPop(&my_cpu->stack_cpu);
+    Stack_pop_value1();
+    Stack_pop_value2();
 
     if (!is_equal(stack_value1, stack_value2)) {
 
-        *number = *((int*)(my_cpu->data + *number)) - 1;
+        *number = Jmp_command_address();
     }
     else {
         (*number) += sizeof(int) - 1;
@@ -206,12 +184,12 @@ void jne(CPU* my_cpu, int* number) {
 void je(CPU* my_cpu, int* number) {
 
     (*number)++;
-    Data stack_value1 = StackPop(&my_cpu->stack_cpu);
-    Data stack_value2 = StackPop(&my_cpu->stack_cpu);
+    Stack_pop_value1();
+    Stack_pop_value2();
 
     if (is_equal(stack_value1, stack_value2)) {
 
-        *number = *((int*)(my_cpu->data + *number)) - 1;
+        *number = Jmp_command_address();
     }
 
     else {
@@ -223,7 +201,7 @@ void call(CPU* my_cpu, int* number, stack* addresses_for_call) {
 
     StackPush(addresses_for_call, *number + sizeof(int));
     (*number)++;
-    *number = *((int*)(my_cpu->data + *number)) - 1;
+    *number = Jmp_command_address();
 
 }
 
@@ -234,76 +212,47 @@ void ret(stack* addresses_for_call, int* number) {
 
 void add(stack* st) {
 
-    if (st->size > 1) {
+    ASSERT(st->size > 1, fprintf(stderr, "Size of stack < 2, we can't get two numbers to add them\n"); exit(EXIT_FAILURE));
 
-        Data sum = StackPop(st) + StackPop(st);
-        StackPush(st, sum);
-    }
-    else {
-
-        fprintf(stderr, "Size of stack < 2, we can't get two numbers to plus them\n");
-    }
+    StackPush(st, StackPop(st) + StackPop(st));
 }
 
 void mul(stack* st) {
 
-    if (st->size > 1) {
+    ASSERT(st->size > 1, fprintf(stderr, "Size of stack < 2, we can't get two numbers to mul them\n"); exit(EXIT_FAILURE));
 
-        Data multiplication = StackPop(st) * StackPop(st);
-        StackPush(st, multiplication);
-    }
-    else {
-
-        printf("Size of stack < 2, we can't get two numbers to mul them\n");
-    }
+    StackPush(st, StackPop(st) * StackPop(st));
 }
 
 void div(stack* st) {
-    
-    if (st->size > 1) {
-        Data value1 = StackPop(st);
-        Data value2 = StackPop(st);
-        Data delim = value1 / value2;
-        StackPush(st, delim);
-    }
-    else {
 
-        printf("Size of stack < 2, we can't get two numbers to div them\n");
-    }
+    ASSERT(st->size > 1, fprintf(stderr, "Size of stack < 2, we can't get two numbers to div them\n"); exit(EXIT_FAILURE));
+    
+    Data stack_value1 = StackPop(st);
+    Data stack_value2 = StackPop(st);
+
+    Data delim = stack_value1 / stack_value2;
+
+    StackPush(st, delim);
 }
 
 void sum(stack* st) {
     
-    if (st->size > 1) {
+    ASSERT(st->size > 1, fprintf(stderr, "Size of stack < 2, we can't get two numbers to sub them\n"); exit(EXIT_FAILURE));
 
-        Data value1 = StackPop(st);
-        Data value2 = StackPop(st);
-
-        Data diff = value1 + value2;
-
-        StackPush(st, diff);
-    }
-    else {
-
-        printf("Size of stack < 2, we can't get two numbers to sub them\n");
-    }
+    StackPush(st, StackPop(st) + StackPop(st));
 }
 
 void sub(stack* st) {
     
-    if (st->size > 1) {
+    ASSERT(st->size > 1, fprintf(stderr, "Size of stack < 2, we can't get two numbers to sub them\n"); exit(EXIT_FAILURE));
 
-        Data value1 = StackPop(st);
-        Data value2 = StackPop(st);
+    Data value1 = StackPop(st);
+    Data value2 = StackPop(st);
 
-        Data diff = value1 - value2;
+    Data diff = value1 - value2;
 
-        StackPush(st, diff);
-    }
-    else {
-
-        printf("Size of stack < 2, we can't get two numbers to sub them\n");
-    }
+    StackPush(st, diff);
 }
 
 void out(stack* st) {
