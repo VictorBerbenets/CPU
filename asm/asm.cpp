@@ -36,7 +36,7 @@ int main(int argc, const char** argv) {
     int command_number      = 0;
     size_t test_bin_number  = 0;
 
-    #define CMD(cmd) if(!strcmp(#cmd, command)){             \
+    #define CMD(cmd, ...) if(!strcmp(#cmd, command)){        \
         value = asm_##cmd;                                    \
         test_bin_commands[test_bin_number] = (char) value;     \
         } else                       

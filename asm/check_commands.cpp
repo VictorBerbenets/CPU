@@ -66,13 +66,19 @@ void Check_push(char** current_token, int line, char* string, int* count_errors,
 
 void Check_ram_command(char*** current_token, int line, char* string, int* count_errors, const char* file_name) {
 
-    int command_data = 0;
-    int readed_symbs = 0;
+    char* command_data_str       = nullptr;
+    int command_data_num         = 0;
+    int readed_symbs             = 0;
+    const int left_symbs         = 3; // one of registers with len = 2 and ']'
+
     (**current_token)++;
-    if (sscanf(**current_token, "%d%n", &command_data, &readed_symbs)) {
+    // printf("ptr  = %s\n", **current_token);
+    // printf("str = %d\n", Strlen(**current_token));
+    if (sscanf(**current_token, "%d%n", &command_data_num, &readed_symbs)) {
 
         (**current_token) += readed_symbs;
-        if (command_data >= Ram_size || command_data < 0) {
+
+        if (command_data_num >= Ram_size || command_data_num < 0) {
             PrintErrorForCommand(__PRETTY_FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_RAM_VALUE); 
         }
         if (***current_token != ']') {
@@ -81,10 +87,27 @@ void Check_ram_command(char*** current_token, int line, char* string, int* count
         else if (Strlen(**current_token) != 1) {
             PrintErrorForCommand(__PRETTY_FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_RAM); 
         }
+    }
+    else if (Strlen(**current_token) == left_symbs) {
+
+        SkipSpaces(current_token);
+
+        if (***current_token >= 'a' && ***current_token <= 'f') {
+            (**current_token)++;
+            if (***current_token == 'x' && *(**current_token + 1) == ']') {
+                return ;
+            }
         }
-        else {
-            PrintErrorForCommand(__PRETTY_FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_RAM); 
-        }
+        PrintErrorForCommand(__PRETTY_FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_RAM); 
+    }
+    else {
+        PrintErrorForCommand(__PRETTY_FUNCTION__, file_name, __LINE__, line, string, count_errors, 1, INVALID_RAM); 
+    } 
+    // printf("Strlen(**current_token) != left_symbs = %d\n", Strlen(**current_token) != left_symbs);
+    // printf("strstr(register_arguments, **current_token) = %s\n", strstr(register_arguments, **current_token));
+    // printf("com = %s\n", command_data_str);
+    // printf("ptr after   = %s\n", **current_token);
+    // printf("strlen after = %d\n", Strlen(**current_token));
 }
 
 
@@ -94,7 +117,6 @@ void Check_pop(char** current_token, int line, char* string, int* count_errors, 
     SkipSpaces(&current_token);
 
     if (**current_token == '[') {
-
         Check_ram_command(&current_token, line, string, count_errors, file_name);
         return ;
     }

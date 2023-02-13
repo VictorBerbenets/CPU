@@ -302,7 +302,6 @@ void Replacement(buffer* asm_commands) {
 int GiveRegistor(char* command) {
 
     ASSERT(command != nullptr);
-
     if      (!strcmp(command, "ax"))  return ax;
     else if (!strcmp(command, "bx"))  return bx;
     else if (!strcmp(command, "cx"))  return cx;
@@ -375,19 +374,35 @@ void MarkRegisterCommand( char** test_bin_commands, size_t* test_bin_number, siz
 void MarkNotRegisterCommand(char** test_bin_commands, size_t* test_bin_number, size_t* size, char* command) {
 
     char* command_ptr = *test_bin_commands + *test_bin_number - 1;
+    const int reg_len = 2;
+
     if (*test_bin_number >= 1 && (*command_ptr == asm_push || *command_ptr == asm_pop)) {
 
         if (strchr(command, '[')) { // ram command
 
             command++;
-            *(*test_bin_commands + *test_bin_number) = Push_or_Pop_ram;
+            *size += sizeof(int) + 1;
 
-            *size              += sizeof(int) + 1;
-            *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+            if (*command >= 'a' && *command <= 'f') {
 
-            (*test_bin_number) ++;
-            *(int*)(*test_bin_commands + *test_bin_number) = atoi(command);
-            (*test_bin_number) += sizeof(int) - 1;
+                *(*test_bin_commands + *test_bin_number) = Push_or_Pop_ram_reg;
+                *(command + reg_len) = '\0';
+
+                *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+
+                (*test_bin_number) ++;
+                *(int*)(*test_bin_commands + *test_bin_number) = GiveRegistor(command);
+                (*test_bin_number) += sizeof(char) - 1;
+            }
+            else {
+                *(*test_bin_commands + *test_bin_number) = Push_or_Pop_ram;
+
+                *test_bin_commands = (char*) realloc(*test_bin_commands, *size * sizeof(char));
+
+                (*test_bin_number) ++;
+                *(int*)(*test_bin_commands + *test_bin_number) = atoi(command);
+                (*test_bin_number) += sizeof(int) - 1;
+            }
         }
         else if (*command_ptr == asm_push) {
             *(*test_bin_commands + *test_bin_number) = Push_number;

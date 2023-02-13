@@ -36,8 +36,9 @@ const int Push_number                     = 0;
 
 const int Push_or_Pop_ram                 = -1;
 
-const int Pop_reg                         = 0;
+const int Push_or_Pop_ram_reg             = -2;           
 
+const int Pop_reg                         = 0;
 
 
 struct buffer {
