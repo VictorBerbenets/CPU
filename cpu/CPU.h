@@ -15,11 +15,12 @@
 
 #include "..//asm//registers.h"
 
-const int Stop_programm = -1;
+const int Stop_programm         = -1;
 
-const int Push_reg         = 69;
-const int Pop_reg          = 69;
-const int Push_or_Pop_ram  = -1;
+const int Push_reg              = 69;
+const int Pop_reg               = 69;
+const int Push_or_Pop_ram       = -1;
+const int Push_or_Pop_ram_reg   = -2;  
 
 
 const int Ram_size       = 1024;

@@ -62,6 +62,12 @@ void push(CPU* my_cpu, int* number) {
         Push_ram_number();
         (*number) += sizeof(int) - 1;
     }
+    else if (my_cpu->data[*number] == Push_or_Pop_ram_reg) {
+        (*number)++;
+        Push_ram_reg();
+        (*number) += sizeof(char) - 1;
+        _StackDump(&my_cpu->stack_cpu);
+    }
     else {
         (*number)++;
         Push_number();
@@ -81,8 +87,14 @@ void pop(CPU* my_cpu, int* number) {
     else if (my_cpu->data[*number] == Push_or_Pop_ram) {
 
         (*number)++;
-        Pop_to_ram();
+        Pop_to_ram_number();
         (*number) += sizeof(int) - 1;
+    }
+    else if (my_cpu->data[*number] == Push_or_Pop_ram_reg) {
+
+        (*number)++;
+        Pop_to_ram_reg();
+        (*number) += sizeof(char) - 1;
     }
     else {
 

@@ -9,9 +9,7 @@
 # OBJ2=$(SRCS2:.cpp=.o)
 
 
-# all:
-# 	make ASM
-# 	make CPU
+# all: ASM CPU
 
 # ASM: $(OBJ1)
 # 	$(CC) $(CFLAGS) $(OBJ1) -o ASM
