@@ -1,166 +1,39 @@
-                                            #This programm solve linear equation
-                                            
-db "Enter coefficients of quadratic equation:\n^"                                                 
 
 
-in
+in 
 pop ax
-in
-pop bx
-in
+
+push ax
+push 1024
+
+jbe : 2
+
+push 0
 pop cx
 
-push ax
 push 0
+pop bx
 
-jne : 10
+: 1
 
-push 0
+push [bx]
+push 1
+push cx   # cx ++
+add
+pop cx
+
+push 100
+pop [bx]     # mov [bx], 0064h
+
 push bx
-jne : 5
+push 1     # bx++
+add
+pop bx
 
-push 0
 push cx
-
-jne : 3
-
-# Infinite Roots
-
-db "Infinite roots\n^"
-
-hlt
-
-: 3
-
-# NO ROOTS
-
-db "No Roots\n^"
-
-hlt
-
-# if bx != 0
-: 5
-
-push bx
-push cx
-push -1
-mul
-div
-
-db "linear equation. Its root: ^"
-
-print
-
-db "\n^"
-
-hlt
-
-: 10
-
-# If ax != 0
-
-push 4
 push ax
-push cx
-mul
-mul
+jne : 1
 
-push bx
-push bx
-mul
-
-sub
-
-sqrt
-pop dx
-
-push dx
-push 0
-
-je : 20
-
-
-push dx
-push 0
-jb : 25
-
-# if dx < 0, end programm and print 'No roots'
-
-db "discriminant < 0 . ^"
-
-call 3    
+video
+: 2
 hlt
-
-: 25
-
-# first Root
-
-push 2   
-push ax
-mul
-pop fx
-push fx
-
-push bx
-push -1
-mul
-
-push dx
-
-sum
-div
-
-db "first root: ^"
-
-print
-
-db ";   ^"
-
-# second Root
-
-push fx     
-
-push dx
-
-push bx
-push -1
-mul
-
-sub
-
-div
-
-db "second root: ^"
-
-print
-
-db "\n^"
-
-hlt
-
-: 20
-
-push 2
-push ax
-mul
-
-push -1
-push bx
-mul
-div
-
-db "discriminant = 0. The root is ^"
-
-print
-
-db "\n^"
-
-meow
-
-hlt
-
-
-
-
-
-
